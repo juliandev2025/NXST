@@ -8,6 +8,14 @@ interface MenuProps {
     onClose: () => void;
 }
 
+const MAIN_LINKS: { label: string; href: string }[] = [
+    { label: "NUEVA COLECCIÓN", href: "/nueva-coleccion" },
+    { label: "CAMISETAS", href: "/camisetas" },
+    { label: "HOODIES", href: "/hoodies" },
+    { label: "CHAQUETAS", href: "/chaquetas" },
+    { label: "ARCHIVE", href: "/archive" },
+];
+
 export default function Menu({ isOpen, onClose }: MenuProps) {
     const [time, setTime] = useState("00:00:00");
 
@@ -50,15 +58,15 @@ export default function Menu({ isOpen, onClose }: MenuProps) {
                     <div className="space-y-4">
                         <span className="font-mono text-[9px] opacity-40 block mb-6">/ MAIN_DIRECTORIES</span>
                         <nav className="flex flex-col space-y-2">
-                            {['NUEVA COLECCIÓN', 'CAMISETAS', 'HOODIES', 'CHAQUETAS', 'ARCHIVE'].map((item) => (
+                            {MAIN_LINKS.map((item) => (
                                 <Link
-                                    key={item}
-                                    href="#"
+                                    key={item.label}
+                                    href={item.href}
                                     onClick={onClose}
                                     className="font-heading text-4xl md:text-5xl font-black hover:italic hover:translate-x-4 transition-all duration-500 flex items-center group"
                                 >
                                     <span className="opacity-0 group-hover:opacity-100 mr-4 text-sm font-mono translate-y-[-10px]">▶</span>
-                                    {item}
+                                    {item.label}
                                 </Link>
                             ))}
                         </nav>
@@ -79,10 +87,10 @@ export default function Menu({ isOpen, onClose }: MenuProps) {
                     <span className="font-mono text-[9px] opacity-40 block mb-8">/ CURRENT_SEQUENCES</span>
                     <div className="grid grid-cols-1 gap-8">
                         <div>
-                            <span className="font-heading text-lg font-bold mb-4 block">CYBER VALENTINE &apos;24</span>
+                            <Link href="/collections/cyber-valentine" onClick={onClose} className="font-heading text-lg font-bold mb-4 block hover:text-gold-primary transition-colors">CYBER VALENTINE &apos;24</Link>
                             <div className="space-y-2">
                                 {['Limited T-Shirts', 'Capsule Alpha', 'Accessories'].map(sub => (
-                                    <Link key={sub} href="#" className="flex justify-between items-center group py-2 industrial-border-b border-black/5 last:border-0 hover:px-2 transition-all">
+                                    <Link key={sub} href="/collections/cyber-valentine" onClick={onClose} className="flex justify-between items-center group py-2 industrial-border-b border-black/5 last:border-0 hover:px-2 transition-all">
                                         <span className="font-mono text-[11px] opacity-70">{sub}</span>
                                         <span className="text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">ACCESS_</span>
                                     </Link>
@@ -91,10 +99,10 @@ export default function Menu({ isOpen, onClose }: MenuProps) {
                         </div>
 
                         <div>
-                            <span className="font-heading text-lg font-bold mb-4 block">ESSENTIAL_WEAR</span>
+                            <Link href="/collections/essential-wear" onClick={onClose} className="font-heading text-lg font-bold mb-4 block hover:text-gold-primary transition-colors">ESSENTIAL_WEAR</Link>
                             <div className="space-y-2">
                                 {['Oversized Tees', 'Cargo Pants', 'Outer Shells'].map(sub => (
-                                    <Link key={sub} href="#" className="flex justify-between items-center group py-2 industrial-border-b border-black/5 last:border-0 hover:px-2 transition-all">
+                                    <Link key={sub} href="/collections/essential-wear" onClick={onClose} className="flex justify-between items-center group py-2 industrial-border-b border-black/5 last:border-0 hover:px-2 transition-all">
                                         <span className="font-mono text-[11px] opacity-70">{sub}</span>
                                         <span className="text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">ACCESS_</span>
                                     </Link>
@@ -123,9 +131,9 @@ export default function Menu({ isOpen, onClose }: MenuProps) {
                     <div className="pt-12">
                         <span className="font-mono text-[9px] opacity-40 block mb-4">/ SOC_CHANNEL</span>
                         <div className="flex gap-4">
-                            {['INSTAGRAM', 'TWITTER', 'DISCORD'].map(s => (
-                                <Link key={s} href="#" className="w-10 h-10 industrial-border flex items-center justify-center font-mono text-[8px] hover:bg-black hover:text-white transition-colors">{s.slice(0, 4)}</Link>
-                            ))}
+                            <a href="https://www.instagram.com/julia4n_/" target="_blank" className="w-10 h-10 industrial-border flex items-center justify-center font-mono text-[8px] hover:bg-black hover:text-white transition-colors">INST</a>
+                            <a href="#" className="w-10 h-10 industrial-border flex items-center justify-center font-mono text-[8px] hover:bg-black hover:text-white transition-colors">TWIT</a>
+                            <a href="#" className="w-10 h-10 industrial-border flex items-center justify-center font-mono text-[8px] hover:bg-black hover:text-white transition-colors">DISC</a>
                         </div>
                     </div>
                 </div>

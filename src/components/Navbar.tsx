@@ -3,19 +3,24 @@
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import Menu from "./Menu";
+import SearchOverlay from "./SearchOverlay";
+import { useCartStore } from "@/lib/cart-store";
 
 export default function Navbar() {
     const [time, setTime] = useState("00:00:00");
     const [sessionSecs, setSessionSecs] = useState(0);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const { getTotalItems, openCart } = useCartStore();
+    const totalItems = getTotalItems();
 
     useEffect(() => {
-        if (isMenuOpen) {
+        if (isMenuOpen || isSearchOpen) {
             document.body.style.overflow = "hidden";
         } else {
             document.body.style.overflow = "unset";
         }
-    }, [isMenuOpen]);
+    }, [isMenuOpen, isSearchOpen]);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -88,7 +93,10 @@ export default function Navbar() {
 
                     {/* Search, Currency, Cart */}
                     <div className="flex w-1/3 h-full items-center">
-                        <div className={`flex-1 h-full industrial-border-l flex items-center justify-center gap-2 hover:bg-black/5 cursor-pointer transition-colors mercury-border ${mercuryClass}`}>
+                        <div
+                            onClick={() => setIsSearchOpen(true)}
+                            className={`flex-1 h-full industrial-border-l flex items-center justify-center gap-2 hover:bg-black/5 cursor-pointer transition-colors mercury-border ${mercuryClass}`}
+                        >
                             <span>SEARCH</span>
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         </div>
@@ -98,14 +106,19 @@ export default function Navbar() {
                             <span>COP ⌄</span>
                         </div>
 
-                        <div className={`flex-1 h-full industrial-border-l flex items-center justify-center gap-2 hover:bg-black/5 cursor-pointer transition-colors font-bold mercury-border ${mercuryClass}`}>
-                            <div className="w-1.5 h-1.5 rounded-full bg-black"></div>
-                            <span>CART [0]</span>
+                        <div
+                            onClick={openCart}
+                            className={`flex-1 h-full industrial-border-l flex items-center justify-center gap-2 hover:bg-black/5 cursor-pointer transition-colors font-bold mercury-border ${mercuryClass} ${totalItems > 0 ? "text-gold-primary" : ""}`}
+                        >
+                            <div className={`w-1.5 h-1.5 rounded-full ${totalItems > 0 ? "bg-gold-primary animate-pulse" : "bg-black"}`}></div>
+                            <span>CART [{totalItems}]</span>
                         </div>
                     </div>
                 </nav>
             </header>
             <Menu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+            <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
         </>
     );
 }
+

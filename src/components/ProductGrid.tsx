@@ -4,217 +4,138 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-
-interface Product {
-    id: string;
-    name: string;
-    category: string;
-    price: string;
-    image: string;
-    status: string;
-    details: string;
-}
-
-const LOCAL_PRODUCTS: Product[] = [
-    {
-        id: "st-001",
-        name: "CORE T-SHIRT // NOIR",
-        category: "CAMISETA",
-        price: "$85.00",
-        image: "/hero-garment.png", // Using existing garment asset
-        status: "ST_ACTIVE",
-        details: "100% HEAVY COTTON / INDUSTRIAL FIT"
-    },
-    {
-        id: "st-002",
-        name: "NEXUS HOODIE // GOLD_EDITION",
-        category: "HOODIE",
-        price: "$145.00",
-        image: "/hoodie.png", // Using our generated luxury hoodie
-        status: "ST_LIMITED",
-        details: "METALLIC BRANDING / OVERSIZED"
-    },
-    {
-        id: "st-003",
-        name: "SAINT SHELL JACKET",
-        category: "CHAQUETA",
-        price: "$220.00",
-        image: "/hero-bg.png", // Using as placeholder for technical jacket
-        status: "ST_ACTIVE",
-        details: "WATERPROOF / MODULAR POCKETS"
-    },
-    {
-        id: "st-004",
-        name: "ESSENTIAL CAMISETA // BLANC",
-        category: "CAMISETA",
-        price: "$75.00",
-        image: "/hero-garment.png",
-        status: "ST_ACTIVE",
-        details: "MINIMALIST DESIGN / REINFORCED"
-    },
-    {
-        id: "st-005",
-        name: "MODULAR HOODIE // TECH",
-        category: "HOODIE",
-        price: "$160.00",
-        image: "/hoodie.png",
-        status: "ST_IN_QUEUE",
-        details: "HIDDEN ZIPS / THERMAL CORE"
-    },
-    {
-        id: "st-006",
-        name: "CARGO CHAQUETA // R&D",
-        category: "CHAQUETA",
-        price: "$285.00",
-        image: "/hero-bg.png",
-        status: "ST_PHASE_01",
-        details: "EXPERIMENTAL FABRIC / GOLD ACCENTS"
-    }
-];
+import { useCartStore } from "@/lib/cart-store";
+import { ALL_PRODUCTS } from "@/lib/products";
 
 export default function ProductGrid() {
-    const [products, setProducts] = useState<Product[]>(LOCAL_PRODUCTS);
-    const [hoveredId, setHoveredId] = useState<string | null>(null);
+    const [products, setProducts] = useState(ALL_PRODUCTS.slice(0, 6)); // Default to first 6 from catalog
     const [isLoading, setIsLoading] = useState(true);
+    const { addItem } = useCartStore();
 
     useEffect(() => {
         async function fetchProducts() {
             try {
-                // Initial attempt to fetch from Supabase
                 const { data, error } = await supabase
-                    .from('products')
-                    .select('*');
-
+                    .from("products")
+                    .select("*")
+                    .limit(6);
                 if (error) throw error;
-
                 if (data && data.length > 0) {
                     setProducts(data);
                 }
             } catch (err) {
-                console.error("Supabase link inactive or table missing, using local assets:", err);
-                // Fallback to LOCAL_PRODUCTS (already set by default)
+                console.log("Using internal catalog assets");
             } finally {
                 setIsLoading(false);
             }
         }
-
         fetchProducts();
     }, []);
 
     return (
-        <section className="relative w-full py-24 px-6 md:px-12 bg-transparent overflow-hidden">
-            {/* Background Grid Pattern for Section Integration */}
-            <div className="absolute inset-0 z-0 opacity-5 pointer-events-none">
-                <div className="absolute inset-x-0 top-0 h-px bg-black"></div>
-                <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 h-full">
-                    {[...Array(8)].map((_, i) => (
-                        <div key={i} className="border-r border-black/10 h-full"></div>
-                    ))}
-                </div>
-            </div>
+        <section className="relative w-full py-32 px-6 md:px-12 bg-transparent">
+            {/* Grid Decorative Lines */}
+            <div className="absolute top-0 left-12 bottom-0 w-[1px] bg-black/[0.03] hidden lg:block"></div>
+            <div className="absolute top-0 right-12 bottom-0 w-[1px] bg-black/[0.03] hidden lg:block"></div>
 
             <div className="relative z-10 max-w-7xl mx-auto">
                 {/* Section Header */}
-                <div className="flex flex-col mb-16 border-l-2 border-gold-primary pl-6">
-                    <span className="font-mono text-[10px] text-gold-muted tracking-[0.3em] uppercase mb-2">
-                        ST_COLLECTION // SERIES_01
-                    </span>
-                    <div className="flex items-center gap-4">
-                        <h2 className="text-4xl md:text-5xl font-heading font-black tracking-tighter">
-                            CURATED_GEAR
+                <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                            <span className="w-8 h-[1px] bg-gold-primary"></span>
+                            <span className="font-mono text-[10px] text-gold-muted tracking-[0.4em] uppercase">
+                                CURRENT_PROTOTYPES
+                            </span>
+                        </div>
+                        <h2 className="text-4xl md:text-5xl font-heading font-black tracking-tight uppercase leading-none">
+                            Featured <br className="md:hidden" /> Catalogs
                         </h2>
-                        {isLoading && (
-                            <div className="h-1 w-12 bg-gold-primary animate-pulse rounded-full" />
-                        )}
                     </div>
+                    <Link
+                        href="/nueva-coleccion"
+                        className="font-mono text-[11px] tracking-[0.2em] uppercase border-b border-black/20 pb-2 hover:border-gold-primary transition-all group flex items-center gap-4"
+                    >
+                        Explore_All
+                        <span className="group-hover:translate-x-2 transition-transform">→</span>
+                    </Link>
                 </div>
 
                 {/* Product Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-16 gap-x-8">
-                    {products.map((product) => (
-                        <Link
-                            key={product.id}
-                            href={`/product/${product.id}`}
-                            className="group relative flex flex-col cursor-pointer no-underline"
-                            onMouseEnter={() => setHoveredId(product.id)}
-                            onMouseLeave={() => setHoveredId(null)}
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 md:gap-x-12 gap-y-16 lg:gap-y-24">
+                    {products.map((product, idx) => (
+                        <div 
+                            key={product.id} 
+                            className="group flex flex-col"
+                            style={{ animationDelay: `${idx * 100}ms` }}
                         >
-                            {/* Technical Meta (Top) */}
-                            <div className="flex justify-between items-end mb-3 px-1">
-                                <span className="font-mono text-[8px] opacity-40 tracking-wider">
-                                    REF: {product.id.toUpperCase()}
-                                </span>
-                                <span className={`font-mono text-[8px] px-2 py-0.5 border ${product.status === 'ST_LIMITED'
-                                    ? 'border-gold-primary text-gold-primary animate-pulse'
-                                    : 'border-black/20 text-black/40'
-                                    }`}>
-                                    {product.status}
-                                </span>
-                            </div>
-
-                            {/* Image Container with Industrial Frame */}
-                            <div className="relative aspect-[4/5] overflow-hidden bg-white/5 border border-black/5 group-hover:border-gold-primary/30 transition-all duration-500">
-                                {/* Subtle Gold Glow on Hover */}
-                                <div
-                                    className={`absolute inset-0 bg-gold-glow opacity-0 transition-opacity duration-700 bg-[radial-gradient(circle_at_center,var(--color-gold-glow),transparent)] group-hover:opacity-100`}
-                                />
-
+                            <Link
+                                href={`/product/${product.id}`}
+                                className="relative aspect-[4/5] overflow-hidden bg-[#e0e0e0] mb-6 block"
+                            >
                                 <Image
                                     src={product.image}
                                     alt={product.name}
                                     fill
-                                    className="object-cover transition-transform duration-700 group-hover:scale-110 grayscale brightness-95 contrast-105"
+                                    className="object-cover transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-110 group-hover:grayscale-[0.5]"
                                 />
 
-                                {/* Category Badge (Overlay) */}
-                                <div className="absolute top-4 right-4 z-20">
-                                    <div className="bg-black text-white font-mono text-[8px] tracking-[0.2em] px-3 py-1 sharp">
-                                        {product.category}
-                                    </div>
+                                {/* Interface Overlay */}
+                                <div className="absolute inset-0 border border-black/0 group-hover:border-black/5 transition-all duration-500"></div>
+
+                                {/* Status Tags */}
+                                <div className="absolute top-4 left-4 flex flex-col gap-2">
+                                    {product.status === "ST_LIMITED" && (
+                                        <span className="bg-black text-white font-mono text-[8px] tracking-[0.2em] px-3 py-1.5 uppercase">
+                                            LIMITED
+                                        </span>
+                                    )}
+                                    {product.status === "ST_PHASE_01" && (
+                                        <span className="bg-gold-primary text-white font-mono text-[8px] tracking-[0.2em] px-3 py-1.5 uppercase">
+                                            NEW_IN
+                                        </span>
+                                    )}
                                 </div>
 
-                                {/* Hover Scanline Effect */}
-                                <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-30 transition-opacity duration-300">
-                                    <div className="scanline" style={{ animationDuration: '2s' }}></div>
+                                {/* Hover Add Button */}
+                                <div className="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center">
+                                    <button
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            addItem({
+                                                id: product.id,
+                                                name: product.name,
+                                                category: product.category,
+                                                price: product.price,
+                                                image: product.image,
+                                                details: product.details,
+                                            });
+                                        }}
+                                        className="relative overflow-hidden px-8 py-3 bg-white text-black font-mono text-[10px] tracking-[0.2em] uppercase sharp hover:bg-gold-primary hover:text-white transition-colors"
+                                    >
+                                        <span className="relative z-10">Add_to_Cart</span>
+                                    </button>
                                 </div>
-                            </div>
+                            </Link>
 
-                            {/* Info Section (Bottom) */}
-                            <div className="mt-6 flex flex-col">
+                            <div className="space-y-1 px-1">
                                 <div className="flex justify-between items-start gap-4">
-                                    <h3 className="font-heading text-lg md:text-xl font-bold leading-tight group-hover:text-gold-primary transition-colors">
+                                    <h3 className="font-heading text-xs font-bold tracking-wider leading-tight group-hover:text-gold-primary transition-colors uppercase">
                                         {product.name}
                                     </h3>
-                                    <span className="font-mono text-base font-bold text-black border-b-2 border-transparent group-hover:border-gold-primary transition-all">
+                                    <span className="font-mono text-[11px] font-medium opacity-80">
                                         {product.price}
                                     </span>
                                 </div>
-                                <p className="font-mono text-[9px] opacity-50 tracking-wide mt-2">
-                                    {product.details}
-                                </p>
+                                <span className="font-mono text-[9px] opacity-30 uppercase tracking-widest">
+                                    {product.category}
+                                </span>
                             </div>
-
-                            {/* Buy/Initialize Trigger (Hidden until hover) */}
-                            <div className="mt-4 overflow-hidden h-0 group-hover:h-10 transition-all duration-300">
-                                <button className="w-full h-full bg-black text-white font-mono text-[10px] tracking-[0.2em] uppercase sharp hover:bg-gold-primary transition-colors">
-                                    ACQUIRE_ASSET
-                                </button>
-                            </div>
-                        </Link>
+                        </div>
                     ))}
-                </div>
-
-                {/* Grid Footer / More Context */}
-                <div className="mt-24 pt-8 border-t border-black/10 flex justify-between items-center opacity-30">
-                    <div className="flex gap-4">
-                        <span className="font-mono text-[8px]">[ 001_SCR ]</span>
-                        <span className="font-mono text-[8px]">[ 002_SCR ]</span>
-                        <span className="font-mono text-[8px] font-bold text-gold-muted">[ PROD_EXP ]</span>
-                    </div>
-                    <span className="font-mono text-[8px] tracking-[0.3em]">NEXUS_SYSTEM_ST_0.4</span>
                 </div>
             </div>
         </section>
     );
 }
-

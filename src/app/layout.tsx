@@ -24,6 +24,9 @@ export const metadata: Metadata = {
 
 import Navbar from "@/components/Navbar";
 import BackgroundEffects from "@/components/BackgroundEffects";
+import CartSidebar from "@/components/CartSidebar";
+import Footer from "@/components/Footer";
+import { Analytics } from "@vercel/analytics/react";
 
 export default function RootLayout({
   children,
@@ -37,9 +40,12 @@ export default function RootLayout({
       >
         <BackgroundEffects />
         <Navbar />
+        <CartSidebar />
         <main className="relative z-10 pt-20 min-h-screen">
           {children}
         </main>
+        <Footer />
+        <Analytics />
       </body>
     </html>
   );

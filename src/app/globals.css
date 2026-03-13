@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --color-gold-primary: #FF5E00;
-  --color-gold-vibrant: #FF7300;
-  --color-gold-muted: #B34200;
-  --color-gold-glow: rgba(255, 94, 0, 0.3);
+  --color-gold-primary: #FF5500;
+  --color-gold-vibrant: #FF6600;
+  --color-gold-muted: #CC4400;
+  --color-gold-glow: rgba(255, 85, 0, 0.4);
 }
 
 :root {
@@ -16,15 +16,38 @@
   --font-mono: var(--font-jetbrains-mono);
 }
 
+::selection {
+  background: var(--color-gold-primary);
+  color: white;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #a3a3a3;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold-primary);
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-body);
   letter-spacing: -0.01em;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Cloudy Fog Animation */
+/* Cinematic Backgrounds */
 .fog-wrapper {
   position: fixed;
   inset: 0;
@@ -33,7 +56,6 @@ body {
   background: #b3b3b3;
 }
 
-/* Technical Pattern Overlay */
 .background-pattern {
   position: fixed;
   inset: 0;

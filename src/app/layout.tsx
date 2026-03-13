@@ -26,6 +26,7 @@ import Navbar from "@/components/Navbar";
 import BackgroundEffects from "@/components/BackgroundEffects";
 import CartSidebar from "@/components/CartSidebar";
 import Footer from "@/components/Footer";
+import EdgeDecorations from "@/components/EdgeDecorations";
 import { Analytics } from "@vercel/analytics/react";
 
 export default function RootLayout({
@@ -39,6 +40,7 @@ export default function RootLayout({
         className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} antialiased`}
       >
         <BackgroundEffects />
+        <EdgeDecorations />
         <Navbar />
         <CartSidebar />
         <main className="relative z-10 pt-20 min-h-screen">

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSettingsStore } from "@/lib/settings-store";
 
 interface CategoryHeroProps {
     title: string;
@@ -11,7 +12,13 @@ interface CategoryHeroProps {
 }
 
 export default function CategoryHero({ title, subtitle, productCount }: CategoryHeroProps) {
+    const [mounted, setMounted] = useState(false);
+    const { language } = useSettingsStore();
     const [isVisible, setIsVisible] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         const t = setTimeout(() => setIsVisible(true), 50);
@@ -25,7 +32,9 @@ export default function CategoryHero({ title, subtitle, productCount }: Category
             <div className="max-w-7xl mx-auto">
                 {/* Breadcrumb */}
                 <div className="flex items-center gap-2 mb-8 font-mono text-[10px] opacity-40 tracking-wider">
-                    <Link href="/" className="hover:opacity-100 transition-opacity">Home</Link>
+                    <Link href="/" className="hover:opacity-100 transition-opacity">
+                        {mounted && language === "ES" ? "Inicio" : "Home"}
+                    </Link>
                     <span>/</span>
                     <span className="opacity-100 text-black">{title}</span>
                 </div>

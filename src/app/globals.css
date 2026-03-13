@@ -71,9 +71,9 @@ body {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(to right, rgba(0, 0, 0, 0.015) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.015) 1px, transparent 1px);
-  background-size: 128px 128px;
+    linear-gradient(to right, rgba(0, 0, 0, 0.01) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.01) 1px, transparent 1px);
+  background-size: 64px 64px;
 }
 
 /* Cinematic Vignette */
@@ -168,8 +168,7 @@ h4,
   text-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
-/* Scanning Interface Effects (Keep if needed, or remove if Option 2 is also to be totally gone) */
-/* We keep them because user only asked to undo the metallic/geometric/mercury-suttle part */
+
 
 .scan-container {
   overflow: hidden;
@@ -297,7 +296,7 @@ h4,
   width: 100px;
 }
 
-/* Hero Option 1: The Core Machine Effects */
+
 .slow-zoom {
   animation: slow-zoom-loop 20s ease-in-out infinite alternate;
 }
@@ -434,3 +433,53 @@ h4,
 .sharp {
   border-radius: 0;
 }
+
+/* Technical Scanning Interface */
+.scan-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: var(--color-gold-primary);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  z-index: 20;
+  pointer-events: none;
+}
+
+.scan-corner-tl {
+  top: 12px;
+  left: 12px;
+  border-top: 1px solid currentColor;
+  border-left: 1px solid currentColor;
+  transform: translate(-5px, -5px);
+}
+
+.scan-corner-tr {
+  top: 12px;
+  right: 12px;
+  border-top: 1px solid currentColor;
+  border-right: 1px solid currentColor;
+  transform: translate(5px, -5px);
+}
+
+.scan-corner-bl {
+  bottom: 12px;
+  left: 12px;
+  border-bottom: 1px solid currentColor;
+  border-left: 1px solid currentColor;
+  transform: translate(-5px, 5px);
+}
+
+.scan-corner-br {
+  bottom: 12px;
+  right: 12px;
+  border-bottom: 1px solid currentColor;
+  border-right: 1px solid currentColor;
+  transform: translate(5px, 5px);
+}
+
+.group:hover .scan-corner {
+  opacity: 0.8;
+  transform: translate(0, 0);
+  filter: drop-shadow(0 0 5px var(--color-gold-glow));
+}

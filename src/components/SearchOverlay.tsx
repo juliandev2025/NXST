@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ALL_PRODUCTS } from "@/lib/products";
+import { useSettingsStore } from "@/lib/settings-store";
 
 interface SearchOverlayProps {
     isOpen: boolean;
@@ -14,8 +15,11 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState(ALL_PRODUCTS.slice(0, 4));
     const inputRef = useRef<HTMLInputElement>(null);
+    const { language } = useSettingsStore();
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        setMounted(true);
         if (isOpen) {
             inputRef.current?.focus();
             document.body.style.overflow = "hidden";
@@ -51,7 +55,7 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                     <input
                         ref={inputRef}
                         type="text"
-                        placeholder="ENTER_SEARCH_QUERY..."
+                        placeholder={mounted && language === "ES" ? "INGRESAR_CONSULTA_BÚSQUEDA..." : "ENTER_SEARCH_QUERY..."}
                         className="w-full bg-transparent border-none outline-none font-mono text-sm tracking-widest uppercase placeholder:opacity-30"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
@@ -62,7 +66,7 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                     onClick={onClose}
                     className="font-mono text-[10px] tracking-widest opacity-50 hover:opacity-100 transition-opacity"
                 >
-                    [ ESC / CLOSE ]
+                    [ ESC / {mounted && language === "ES" ? "CERRAR" : "CLOSE"} ]
                 </button>
             </div>
 
@@ -71,7 +75,9 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                 <div className="max-w-7xl mx-auto">
                     <div className="flex items-center gap-3 mb-10 opacity-40">
                         <span className="font-mono text-[9px] tracking-[0.3em]">
-                            {query ? `SEARCH_RESULTS_FOUND: ${results.length}` : "SUGGESTED_ASSETS"}
+                            {query 
+                                ? (mounted && language === "ES" ? `RESULTADOS_BÚSQUEDA: ${results.length}` : `SEARCH_RESULTS_FOUND: ${results.length}`) 
+                                : (mounted && language === "ES" ? "ACTIVOS_SUGERIDOS" : "SUGGESTED_ASSETS")}
                         </span>
                         <div className="h-px flex-1 bg-black/10"></div>
                     </div>
@@ -104,9 +110,11 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                         </div>
                     ) : (
                         <div className="flex flex-col items-center justify-center py-20 text-center">
-                            <h3 className="font-heading text-xl font-bold mb-4 opacity-50">NO_ASSETS_MATCH_QUERY</h3>
+                            <h3 className="font-heading text-xl font-bold mb-4 opacity-50">{mounted && language === "ES" ? "NINGÚN_ACTIVO_COINCIDE" : "NO_ASSETS_MATCH_QUERY"}</h3>
                             <p className="font-mono text-[10px] opacity-30 tracking-widest max-w-sm mx-auto">
-                                TRY ADJUSTING YOUR PARAMETERS OR SEARCHING BY CATEGORY (E.G. HOODIE, CAMISETA).
+                                {mounted && language === "ES" 
+                                    ? "INTENTA AJUSTAR TUS PARÁMETROS O BUSCAR POR CATEGORÍA (E.X. HOODIE, CAMISETA)." 
+                                    : "TRY ADJUSTING YOUR PARAMETERS OR SEARCHING BY CATEGORY (E.G. HOODIE, CAMISETA)."}
                             </p>
                         </div>
                     )}

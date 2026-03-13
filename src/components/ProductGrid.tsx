@@ -5,12 +5,19 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useCartStore } from "@/lib/cart-store";
-import { ALL_PRODUCTS } from "@/lib/products";
+import { useSettingsStore } from "@/lib/settings-store";
+import { ALL_PRODUCTS, formatPrice } from "@/lib/products";
 
 export default function ProductGrid() {
     const [products, setProducts] = useState(ALL_PRODUCTS.slice(0, 6)); // Default to first 6 from catalog
     const [isLoading, setIsLoading] = useState(true);
     const { addItem } = useCartStore();
+    const { language, currency } = useSettingsStore();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         async function fetchProducts() {
@@ -45,18 +52,22 @@ export default function ProductGrid() {
                         <div className="flex items-center gap-3">
                             <span className="w-8 h-[1px] bg-gold-primary"></span>
                             <span className="font-mono text-[10px] text-gold-muted tracking-[0.4em] uppercase">
-                                CURRENT_PROTOTYPES
+                                {mounted && language === "ES" ? "PROTOTIPOS_ACTUALES" : "CURRENT_PROTOTYPES"}
                             </span>
                         </div>
                         <h2 className="text-4xl md:text-5xl font-heading font-black tracking-tight uppercase leading-none">
-                            Featured <br className="md:hidden" /> Catalogs
+                            {mounted && language === "ES" ? (
+                                <>Catálogos <br className="md:hidden" /> Destacados</>
+                            ) : (
+                                <>Featured <br className="md:hidden" /> Catalogs</>
+                            )}
                         </h2>
                     </div>
                     <Link
                         href="/nueva-coleccion"
                         className="font-mono text-[11px] tracking-[0.2em] uppercase border-b border-black/20 pb-2 hover:border-gold-primary transition-all group flex items-center gap-4"
                     >
-                        Explore_All
+                        {mounted && language === "ES" ? "Explorar_Todo" : "Explore_All"}
                         <span className="group-hover:translate-x-2 transition-transform">→</span>
                     </Link>
                 </div>
@@ -80,19 +91,25 @@ export default function ProductGrid() {
                                     className="object-cover transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-110 group-hover:grayscale-[0.5]"
                                 />
 
-                                {/* Interface Overlay */}
+
+                                <div className="scan-corner scan-corner-tl"></div>
+                                <div className="scan-corner scan-corner-tr"></div>
+                                <div className="scan-corner scan-corner-bl"></div>
+                                <div className="scan-corner scan-corner-br"></div>
+
+
                                 <div className="absolute inset-0 border border-black/0 group-hover:border-black/5 transition-all duration-500"></div>
 
-                                {/* Status Tags */}
+
                                 <div className="absolute top-4 left-4 flex flex-col gap-2">
                                     {product.status === "ST_LIMITED" && (
                                         <span className="bg-black text-white font-mono text-[8px] tracking-[0.2em] px-3 py-1.5 uppercase">
-                                            LIMITED
+                                            {mounted && language === "ES" ? "LIMITADO // 限定" : "LIMITED // 限定"}
                                         </span>
                                     )}
                                     {product.status === "ST_PHASE_01" && (
                                         <span className="bg-gold-primary text-white font-mono text-[8px] tracking-[0.2em] px-3 py-1.5 uppercase">
-                                            NEW_IN
+                                            {mounted && language === "ES" ? "NUEVO // 新入荷" : "NEW_IN // 新入荷"}
                                         </span>
                                     )}
                                 </div>
@@ -114,7 +131,7 @@ export default function ProductGrid() {
                                         }}
                                         className="relative overflow-hidden px-8 py-3 bg-white text-black font-mono text-[10px] tracking-[0.2em] uppercase sharp hover:bg-gold-primary hover:text-white transition-colors"
                                     >
-                                        <span className="relative z-10">Add_to_Cart</span>
+                                        <span className="relative z-10">{mounted && language === "ES" ? "Añadir_al_Carrito" : "Add_to_Cart"}</span>
                                     </button>
                                 </div>
                             </Link>
@@ -125,7 +142,7 @@ export default function ProductGrid() {
                                         {product.name}
                                     </h3>
                                     <span className="font-mono text-[11px] font-medium opacity-80">
-                                        {product.price}
+                                        {mounted ? formatPrice(product.price, currency) : product.price}
                                     </span>
                                 </div>
                                 <span className="font-mono text-[9px] opacity-30 uppercase tracking-widest">

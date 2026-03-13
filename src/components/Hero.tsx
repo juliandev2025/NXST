@@ -2,11 +2,18 @@
 
 import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
+import { useSettingsStore } from "@/lib/settings-store";
 
 export default function Hero() {
+    const [mounted, setMounted] = useState(false);
+    const { language } = useSettingsStore();
     const [isVisible, setIsVisible] = useState(false);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         setIsVisible(true);
@@ -71,18 +78,19 @@ export default function Hero() {
                     </h1>
                 </div>
 
-                <p className="mt-12 font-mono text-[10px] md:text-[11px] opacity-50 max-w-md text-center leading-relaxed tracking-wider uppercase">
-                    Architectural apparel for the posthuman era. <br />
-                    Industrial utility meets cybernetic refinement.
+                <p className="mt-12 font-mono text-[10px] md:text-[11px] opacity-50 max-max-w-md text-center leading-relaxed tracking-wider uppercase">
+                    {mounted && language === "ES" 
+                        ? "Ropa arquitectónica para la era posthumana. La utilidad industrial se une al refinamiento cibernético." 
+                        : "Architectural apparel for the posthuman era. Industrial utility meets cybernetic refinement."}
                 </p>
 
                 <div className="mt-12 flex flex-col md:flex-row gap-6">
                     <button className="mercury-btn group relative px-12 py-4 bg-black text-white font-mono text-[10px] tracking-[0.2em] uppercase sharp overflow-hidden">
-                        <span className="relative z-10">INITIALIZE_ASSETS</span>
+                        <span className="relative z-10">{mounted && language === "ES" ? "INICIALIZAR_ACTIVOS" : "INITIALIZE_ASSETS"}</span>
                         <div className="btn-shine"></div>
                     </button>
                     <button className="px-12 py-4 border border-black/10 hover:border-black transition-colors font-mono text-[10px] tracking-[0.2em] uppercase sharp">
-                        View_Manifesto
+                        {mounted && language === "ES" ? "Ver_Manifiesto" : "View_Manifesto"}
                     </button>
                 </div>
             </div>
@@ -103,7 +111,9 @@ export default function Hero() {
 
             <div className="absolute bottom-12 right-12 hidden lg:block opacity-20">
                 <div className="flex flex-col items-end gap-2 text-right">
-                    <span className="font-mono text-[8px] tracking-[0.3em]">[ STATUS: OPERATIONAL ]</span>
+                    <span className="font-mono text-[8px] tracking-[0.3em]">
+                        {mounted && language === "ES" ? "[ ESTADO: OPERATIVO ]" : "[ STATUS: OPERATIONAL ]"}
+                    </span>
                     <div className="h-0.5 w-32 bg-black/10 relative overflow-hidden">
                         <div className="absolute inset-0 bg-gold-primary w-2/3 animate-[progress_3s_ease-in-out_infinite]"></div>
                     </div>

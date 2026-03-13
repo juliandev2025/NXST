@@ -5,10 +5,14 @@ import ProductDetailsContent from "@/components/ProductDetailsContent";
 import { notFound } from "next/navigation";
 
 interface Props {
-    params: { id: string };
+    params: Promise<{ id: string }>;
 }
 
 async function getProduct(id: string) {
+    if (id.startsWith("st-")) {
+        return ALL_PRODUCTS.find((p) => p.id === id) || null;
+    }
+
     try {
         const { data, error } = await supabase
             .from("products")
@@ -23,7 +27,8 @@ async function getProduct(id: string) {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const product = await getProduct(params.id);
+    const { id } = await params;
+    const product = await getProduct(id);
 
     if (!product) {
         return {
@@ -50,11 +55,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProductPage({ params }: Props) {
-    const product = await getProduct(params.id);
+    const { id } = await params;
+    console.log("Fetching product with ID:", id);
+    const product = await getProduct(id);
 
     if (!product) {
+        console.log("Product not found for ID:", id);
         notFound();
     }
 
+    console.log("Found product:", product.name);
     return <ProductDetailsContent initialProduct={product} />;
 }

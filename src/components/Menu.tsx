@@ -2,29 +2,40 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSettingsStore } from "@/lib/settings-store";
 
 interface MenuProps {
     isOpen: boolean;
     onClose: () => void;
 }
 
-const MAIN_LINKS: { label: string; href: string }[] = [
-    { label: "NUEVA COLECCIÓN", href: "/nueva-coleccion" },
-    { label: "CAMISETAS", href: "/camisetas" },
+const getLinks = (isEs: boolean) => [
+    { label: isEs ? "NUEVA COLECCIÓN" : "NEW COLLECTION", href: "/nueva-coleccion" },
+    { label: isEs ? "CAMISETAS" : "T-SHIRTS", href: "/camisetas" },
     { label: "HOODIES", href: "/hoodies" },
-    { label: "CHAQUETAS", href: "/chaquetas" },
-    { label: "ARCHIVE", href: "/archive" },
+    { label: isEs ? "CHAQUETAS" : "JACKETS", href: "/chaquetas" },
+    { label: isEs ? "ARCHIVO" : "ARCHIVE", href: "/archive" },
 ];
 
 export default function Menu({ isOpen, onClose }: MenuProps) {
+    const [mounted, setMounted] = useState(false);
+    const { language } = useSettingsStore();
     const [time, setTime] = useState("00:00:00");
+    const isEs = language === "ES";
+    const MAIN_LINKS = getLinks(mounted && isEs);
 
     useEffect(() => {
+        setMounted(true);
         const timer = setInterval(() => {
             const now = new Date();
-            setTime(now.getUTCHours().toString().padStart(2, '0') + ":" +
-                now.getUTCMinutes().toString().padStart(2, '0') + ":" +
-                now.getUTCSeconds().toString().padStart(2, '0'));
+            const bogotaTime = now.toLocaleTimeString("en-GB", {
+                timeZone: "America/Bogota",
+                hour12: false,
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit"
+            });
+            setTime(bogotaTime);
         }, 1000);
         return () => clearInterval(timer);
     }, []);
@@ -33,7 +44,7 @@ export default function Menu({ isOpen, onClose }: MenuProps) {
 
     return (
         <div className="fixed inset-0 z-[100] bg-[#b3b3b3]/95 backdrop-blur-xl flex flex-col items-stretch overflow-hidden text-black">
-            {/* Menu Header (Mirrors Navbar layout but for Closing) */}
+
             <div className="flex w-full industrial-border-b h-12 items-center font-mono text-[10px] wide-tracking uppercase">
                 <div
                     onClick={onClose}
@@ -41,22 +52,22 @@ export default function Menu({ isOpen, onClose }: MenuProps) {
                 >
                     <div className="w-4 h-[1px] bg-black rotate-45 absolute"></div>
                     <div className="w-4 h-[1px] bg-black -rotate-45 relative"></div>
-                    <span className="ml-4">CLOSE</span>
+                    <span className="ml-4">{mounted && isEs ? "CERRAR" : "CLOSE"}</span>
                 </div>
                 <div className="flex-[1.5] h-full flex items-center justify-center">
-                    <span className="font-heading text-xl font-black tracking-[0.1em]">NAVIGATION_INTERFACE</span>
+                    <span className="font-heading text-xl font-black tracking-[0.1em]">{mounted && isEs ? "INTERFAZ_NAVEGACIÓN" : "NAVIGATION_INTERFACE"}</span>
                 </div>
                 <div className="w-1/3 h-full industrial-border-l flex items-center justify-center px-6">
-                    <span className="opacity-50">UTC_{time}</span>
+                    <span className="opacity-50">BOG_{mounted ? time : "00:00:00"}</span>
                 </div>
             </div>
 
-            {/* Main Menu Grid */}
+
             <div className="flex-1 grid grid-cols-1 md:grid-cols-3 w-full">
-                {/* Main Links */}
+
                 <div className="industrial-border-r p-8 md:p-12 flex flex-col justify-between">
                     <div className="space-y-4">
-                        <span className="font-mono text-[9px] opacity-40 block mb-6">/ MAIN_DIRECTORIES</span>
+                        <span className="font-mono text-[9px] opacity-40 block mb-6">/ {mounted && isEs ? "UNIDADES_DESPLIEGUE" : "DEPLOYMENT_UNITS"}</span>
                         <nav className="flex flex-col space-y-2">
                             {MAIN_LINKS.map((item) => (
                                 <Link
@@ -73,35 +84,39 @@ export default function Menu({ isOpen, onClose }: MenuProps) {
                     </div>
 
                     <div className="space-y-2 pt-12">
-                        <span className="font-mono text-[9px] opacity-40 block mb-4">/ SYSTEM_OPERATIONS</span>
+                        <span className="font-mono text-[9px] opacity-40 block mb-4">/ {mounted && isEs ? "PROTOCOLO_SISTEMA" : "SYSTEM_PROTOCOLS"}</span>
                         <div className="flex flex-wrap gap-x-8 gap-y-2">
-                            <Link href="#" className="font-mono text-[10px] hover:underline underline-offset-4 decoration-1">MY ACCOUNT</Link>
-                            <Link href="#" className="font-mono text-[10px] hover:underline underline-offset-4 decoration-1">ORDER TRACKING</Link>
-                            <Link href="#" className="font-mono text-[10px] hover:underline underline-offset-4 decoration-1">WISH LIST</Link>
+                            <Link href="#" className="font-mono text-[10px] hover:underline underline-offset-4 decoration-1">{mounted && isEs ? "MI CUENTA" : "MY ACCOUNT"}</Link>
+                            <Link href="#" className="font-mono text-[10px] hover:underline underline-offset-4 decoration-1">{mounted && isEs ? "RASTREO PEDIDO" : "ORDER TRACKING"}</Link>
+                            <Link href="#" className="font-mono text-[10px] hover:underline underline-offset-4 decoration-1">{mounted && isEs ? "LISTA DESEOS" : "WISH LIST"}</Link>
                         </div>
                     </div>
                 </div>
 
-                {/* Collections / Sub-links */}
+
                 <div className="industrial-border-r p-8 md:p-12 flex flex-col bg-black/[0.02]">
-                    <span className="font-mono text-[9px] opacity-40 block mb-8">/ CURRENT_SEQUENCES</span>
+                    <span className="font-mono text-[9px] opacity-40 block mb-8">/ {mounted && isEs ? "SECUENCIAS_ACTIVAS" : "ACTIVE_SEQUENCES"}</span>
                     <div className="grid grid-cols-1 gap-8">
                         <div>
-                            <Link href="/collections/cyber-valentine" onClick={onClose} className="font-heading text-lg font-bold mb-4 block hover:text-gold-primary transition-colors">CYBER VALENTINE &apos;24</Link>
+                            <Link href="/collections/spring-summer-25" onClick={onClose} className="font-heading text-lg font-bold mb-4 block hover:text-gold-primary transition-colors">
+                                {mounted && isEs ? "SPRING/SUMMER '25" : "SPRING/SUMMER '25"}
+                            </Link>
                             <div className="space-y-2">
-                                {['Limited T-Shirts', 'Capsule Alpha', 'Accessories'].map(sub => (
-                                    <Link key={sub} href="/collections/cyber-valentine" onClick={onClose} className="flex justify-between items-center group py-2 industrial-border-b border-black/5 last:border-0 hover:px-2 transition-all">
+                                {[(mounted && isEs ? 'Camisetas Limitadas' : 'Limited T-Shirts'), (mounted && isEs ? 'Cápsula Alpha' : 'Capsule Alpha'), (mounted && isEs ? 'Accesorios' : 'Accessories')].map(sub => (
+                                    <Link key={sub} href="/collections/spring-summer-25" onClick={onClose} className="flex justify-between items-center group py-2 industrial-border-b border-black/5 last:border-0 hover:px-2 transition-all">
                                         <span className="font-mono text-[11px] opacity-70">{sub}</span>
-                                        <span className="text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">ACCESS_</span>
+                                        <span className="text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">{mounted && isEs ? "ACCEDER_" : "ACCESS_"}</span>
                                     </Link>
                                 ))}
                             </div>
                         </div>
 
                         <div>
-                            <Link href="/collections/essential-wear" onClick={onClose} className="font-heading text-lg font-bold mb-4 block hover:text-gold-primary transition-colors">ESSENTIAL_WEAR</Link>
+                            <Link href="/collections/essential-wear" onClick={onClose} className="font-heading text-lg font-bold mb-4 block hover:text-gold-primary transition-colors">
+                                {mounted && isEs ? "ROPA_ESENCIAL" : "ESSENTIAL_WEAR"}
+                            </Link>
                             <div className="space-y-2">
-                                {['Oversized Tees', 'Cargo Pants', 'Outer Shells'].map(sub => (
+                                {[(mounted && isEs ? 'Camisetas Oversized' : 'Oversized Tees'), (mounted && isEs ? 'Pantalones Cargo' : 'Cargo Pants'), (mounted && isEs ? 'Capas Exteriores' : 'Outer Shells')].map(sub => (
                                     <Link key={sub} href="/collections/essential-wear" onClick={onClose} className="flex justify-between items-center group py-2 industrial-border-b border-black/5 last:border-0 hover:px-2 transition-all">
                                         <span className="font-mono text-[11px] opacity-70">{sub}</span>
                                         <span className="text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">ACCESS_</span>
@@ -112,18 +127,20 @@ export default function Menu({ isOpen, onClose }: MenuProps) {
                     </div>
                 </div>
 
-                {/* About / Manifesto / Info */}
+
                 <div className="p-8 md:p-12 flex flex-col justify-between">
                     <div>
-                        <span className="font-mono text-[9px] opacity-40 block mb-8">/ BRAND_ETHOS</span>
+                        <span className="font-mono text-[9px] opacity-40 block mb-8">/ {mounted && isEs ? "MANIFESTO_LAB" : "LAB_MANIFESTO"}</span>
                         <div className="space-y-8">
                             <p className="font-mono text-[11px] leading-relaxed opacity-60 max-w-[280px]">
-                                NEXUS SAINT IS A SYSTEMIC RESPONSE TO THE POSTHUMAN CONDITION. WE DEVELOP APPAREL AS INTERFACE, BLENDING INDUSTRIAL FUNCTIONALITY WITH CYBERNETIC AESTHETICS.
+                                {mounted && isEs 
+                                    ? "NEXUS SAINT ES UNA RESPUESTA SISTÉMICA A LA CONDICIÓN POSTHUMANA. DESARROLLAMOS ROPA COMO INTERFAZ, MEZCLANDO FUNCIONALIDAD INDUSTRIAL CON ESTÉTICA CIBERNÉTICA."
+                                    : "NEXUS SAINT IS A SYSTEMIC RESPONSE TO THE POSTHUMAN CONDITION. WE DEVELOP APPAREL AS INTERFACE, BLENDING INDUSTRIAL FUNCTIONALITY WITH CYBERNETIC AESTHETICS."}
                             </p>
                             <nav className="flex flex-col space-y-4">
-                                <Link href="#" className="font-heading text-xl font-bold hover:tracking-widest transition-all">MANIFESTO</Link>
-                                <Link href="#" className="font-heading text-xl font-bold hover:tracking-widest transition-all">STORES</Link>
-                                <Link href="#" className="font-heading text-xl font-bold hover:tracking-widest transition-all">CONTACT</Link>
+                                <Link href="#" className="font-heading text-xl font-bold hover:tracking-widest transition-all">{mounted && isEs ? "MANIFIESTO" : "MANIFESTO"}</Link>
+                                <Link href="#" className="font-heading text-xl font-bold hover:tracking-widest transition-all">{mounted && isEs ? "TIENDAS" : "STORES"}</Link>
+                                <Link href="#" className="font-heading text-xl font-bold hover:tracking-widest transition-all">{mounted && isEs ? "CONTACTO" : "CONTACT"}</Link>
                             </nav>
                         </div>
                     </div>
@@ -139,17 +156,17 @@ export default function Menu({ isOpen, onClose }: MenuProps) {
                 </div>
             </div>
 
-            {/* Menu Footer */}
+
             <div className="flex w-full industrial-border-t h-12 items-center font-mono text-[8px] wide-tracking uppercase px-8 justify-between opacity-40">
-                <span>© 2024 NEXUS_SAINT_SYSTEMS</span>
+                <span>© 2025 NEXUS_SAINT_SYSTEMS</span>
                 <div className="flex gap-12">
-                    <span>STATUS: OPERATIONAL</span>
-                    <span>ENCRYPTION: ACTIVE</span>
+                    <span>{mounted && isEs ? "ESTADO: OPERATIVO" : "STATUS: OPERATIONAL"}</span>
+                    <span>{mounted && isEs ? "ENCRIPTACIÓN: ACTIVA" : "ENCRYPTION: ACTIVE"}</span>
                     <span>LOC: BOGOTA_COL</span>
                 </div>
             </div>
 
-            {/* Decorative Grid Lines */}
+
             <div className="absolute top-0 bottom-0 left-1/4 w-[1px] bg-black/5 pointer-events-none hidden md:block"></div>
             <div className="absolute top-0 bottom-0 left-[58.33%] w-[1px] bg-black/5 pointer-events-none hidden md:block"></div>
         </div>

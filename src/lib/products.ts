@@ -1,9 +1,6 @@
 import { CategoryProduct } from "@/components/CategoryProductGrid";
 
-/**
- * Central product catalog for NEXUS SAINT.
- * All category pages pull from this single source of truth.
- */
+
 
 export const ALL_PRODUCTS: CategoryProduct[] = [
     // === CAMISETAS ===
@@ -15,7 +12,7 @@ export const ALL_PRODUCTS: CategoryProduct[] = [
         image: "/product-tshirt-noir.png",
         images: ["/product-tshirt-noir.png", "/product-tshirt-blanc.png", "/hoodie.png"],
         status: "ST_ACTIVE",
-        details: "100% Heavy Cotton · Industrial Fit",
+        details: "COMPOSICIÓN: 100% HEAVY COTTON // DENSIDAD: 400GSM // ORIGEN: NXS_LAB_01",
     },
     {
         id: "st-004",
@@ -24,7 +21,7 @@ export const ALL_PRODUCTS: CategoryProduct[] = [
         price: "$75.00",
         image: "/product-tshirt-blanc.png",
         status: "ST_ACTIVE",
-        details: "Minimalist Design · Reinforced Seams",
+        details: "COMPOSICIÓN: 100% ORGANIC COTTON // DENSIDAD: 280GSM // ESPEC: REINFORCED SEAMS",
     },
     {
         id: "st-007",
@@ -33,16 +30,16 @@ export const ALL_PRODUCTS: CategoryProduct[] = [
         price: "$90.00",
         image: "/product-tshirt-noir.png",
         status: "ST_ACTIVE",
-        details: "Relaxed Silhouette · Double Stitched",
+        details: "COMPOSICIÓN: 100% PREMIUM COTTON // CORTE: RELAXED SILHOUETTE // ORIGEN: NXS_LAB_01",
     },
     {
         id: "st-008",
-        name: "CYBER V '24 TEE — LIMITED",
+        name: "SPRING/SUMMER '25 TEE — LIMITED",
         category: "CAMISETA",
         price: "$110.00",
         image: "/product-tshirt-blanc.png",
         status: "ST_LIMITED",
-        details: "Valentine Capsule · Numbered Edition",
+        details: "PROGRAMA: S/S '25 CAPSULE // EDICIÓN: BATCH_LIMITED // ORIGEN: NXS_LAB_02",
     },
 
     // === HOODIES ===
@@ -53,7 +50,7 @@ export const ALL_PRODUCTS: CategoryProduct[] = [
         price: "$145.00",
         image: "/product-hoodie-noir.png",
         status: "ST_LIMITED",
-        details: "Metallic Branding · Oversized",
+        details: "TEJIDO: BRUSHED FLEECE // DENSIDAD: 500GSM // DETALLE: METALLIC BRANDING",
     },
     {
         id: "st-005",
@@ -62,7 +59,7 @@ export const ALL_PRODUCTS: CategoryProduct[] = [
         price: "$160.00",
         image: "/product-hoodie-stealth.png",
         status: "ST_IN_QUEUE",
-        details: "Hidden Zips · Thermal Core",
+        details: "TEJIDO: THERMAL CORE // TIPO: MODULAR_ZIP // ORIGEN: NXS_LAB_03",
     },
     {
         id: "st-009",
@@ -71,7 +68,7 @@ export const ALL_PRODUCTS: CategoryProduct[] = [
         price: "$155.00",
         image: "/product-hoodie-noir.png",
         status: "ST_ACTIVE",
-        details: "Matte Black · Bonded Seams",
+        details: "TEJIDO: PRE-SHRUNK FLEECE // COLOR: MATTE BLACK // ORIGEN: NXS_LAB_01",
     },
 
     // === CHAQUETAS ===
@@ -82,7 +79,7 @@ export const ALL_PRODUCTS: CategoryProduct[] = [
         price: "$220.00",
         image: "/product-jacket-shell.png",
         status: "ST_ACTIVE",
-        details: "Waterproof · Modular Pockets",
+        details: "MEMBRANA: WATERPROOF SHELL // ESPEC: MODULAR POCKETS // ORIGEN: NXS_LAB_04",
     },
     {
         id: "st-006",
@@ -91,7 +88,7 @@ export const ALL_PRODUCTS: CategoryProduct[] = [
         price: "$285.00",
         image: "/product-jacket-shell.png",
         status: "ST_PHASE_01",
-        details: "Experimental Fabric · Gold Accents",
+        details: "PROGRAMA: EXPERIMENTAL_UNIT // ACABADO: GOLD ACCENTS // ORIGEN: NXS_LAB_04",
     },
     {
         id: "st-010",
@@ -100,7 +97,7 @@ export const ALL_PRODUCTS: CategoryProduct[] = [
         price: "$310.00",
         image: "/product-jacket-shell.png",
         status: "ST_ACTIVE",
-        details: "Insulated Core · Wind Resistant",
+        details: "MATERIAL: INSULATED CORE // ESPEC: WIND RESISTANT // ORIGEN: NXS_LAB_04",
     },
 
     // === ACCESORIOS ===
@@ -111,7 +108,7 @@ export const ALL_PRODUCTS: CategoryProduct[] = [
         price: "$65.00",
         image: "/product-cargo-pants.png",
         status: "ST_ACTIVE",
-        details: "Magnetic Buckle · Nylon Webbing",
+        details: "SISTEMA: MAGNETIC BUCKLE // WEBBING: INDUSTRIAL NYLON // ORIGEN: NXS_LAB_03",
     },
     {
         id: "st-012",
@@ -120,7 +117,7 @@ export const ALL_PRODUCTS: CategoryProduct[] = [
         price: "$55.00",
         image: "/product-tshirt-noir.png",
         status: "ST_ACTIVE",
-        details: "Structured Fit · Embroidered Logo",
+        details: "TIPO: STRUCTURED FIT // LOGO: EMBROIDERED // ORIGEN: NXS_LAB_01",
     },
 
     // === PANTALONES ===
@@ -131,7 +128,7 @@ export const ALL_PRODUCTS: CategoryProduct[] = [
         price: "$135.00",
         image: "/product-cargo-pants.png",
         status: "ST_ACTIVE",
-        details: "Ripstop Fabric · Multi-Pocket",
+        details: "TEJIDO: RIPSTOP FABRIC // ESPEC: MULTI-POCKET // ORIGEN: NXS_LAB_03",
     },
     {
         id: "st-014",
@@ -140,11 +137,11 @@ export const ALL_PRODUCTS: CategoryProduct[] = [
         price: "$115.00",
         image: "/product-cargo-pants.png",
         status: "ST_ACTIVE",
-        details: "Tech Fleece · Tapered Cut",
+        details: "TEJIDO: TECH FLEECE // CORTE: TAPERED FIT // ORIGEN: NXS_LAB_01",
     },
 ];
 
-// --- FILTER HELPERS ---
+
 
 export function getProductsByCategory(category: string): CategoryProduct[] {
     return ALL_PRODUCTS.filter(
@@ -162,7 +159,7 @@ export function getArchiveProducts(): CategoryProduct[] {
     return ALL_PRODUCTS.filter((p) => p.status === "ST_IN_QUEUE");
 }
 
-export function getCyberValentineProducts(): CategoryProduct[] {
+export function getSpringSummerProducts(): CategoryProduct[] {
     return ALL_PRODUCTS.filter(
         (p) =>
             p.id === "st-008" ||
@@ -170,6 +167,19 @@ export function getCyberValentineProducts(): CategoryProduct[] {
             p.id === "st-011" ||
             p.id === "st-012"
     );
+}
+
+
+
+export const USD_TO_COP = 4000;
+
+export function formatPrice(priceStr: string, currency: "USD" | "COP"): string {
+    const numericPrice = parseFloat(priceStr.replace("$", "").replace(",", ""));
+    if (currency === "COP") {
+        const copPrice = numericPrice * USD_TO_COP;
+        return `COP $${copPrice.toLocaleString("es-CO", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+    }
+    return `$${numericPrice.toFixed(2)}`;
 }
 
 export function getEssentialWearProducts(): CategoryProduct[] {

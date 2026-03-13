@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 import CategoryHero from "@/components/CategoryHero";
 import CategoryProductGrid from "@/components/CategoryProductGrid";
-import { getEssentialWearProducts } from "@/lib/products";
+import { getSpringSummerProducts } from "@/lib/products";
 import { useSettingsStore } from "@/lib/settings-store";
 
-export default function EssentialWearPage() {
+export default function SpringSummer25Page() {
     const [mounted, setMounted] = useState(false);
     const { language } = useSettingsStore();
-    const products = getEssentialWearProducts();
+    const products = getSpringSummerProducts();
     const isEs = language === "ES";
 
     useEffect(() => {
@@ -17,17 +17,17 @@ export default function EssentialWearPage() {
     }, []);
 
     const content = {
-        title: "ESSENTIAL_WEAR",
+        title: "SPRING/SUMMER '25",
         subtitle: mounted && isEs 
-            ? "PIEZAS DE UTILIDAD CENTRAL. SILUETAS OVERSIZED, CARGO TÁCTICO Y CAPAS EXTERIORES PROTECTORAS PARA EL DESPLIEGUE DIARIO."
-            : "CORE UTILITY PIECES. OVERSIZED SILHOUETTES, TACTICAL CARGO, AND PROTECTIVE OUTER SHELLS FOR EVERYDAY DEPLOYMENT.",
+            ? "DESPLIEGUE ESTACIONAL. MATERIALES LIGEROS, SILUETAS VENTILADAS Y ADAPTACIONES DE ALTA VISIBILIDAD."
+            : "SEASONAL DEPLOYMENT. LIGHTWEIGHT MATERIALS, VENTILATED SILHOUETTES, AND HIGH-VISIBILITY ADAPTATIONS.",
         categories: [
-            { en: "Oversized Tees", es: "Camisetas Oversized" },
-            { en: "Cargo Pants", es: "Pantalones Cargo" },
-            { en: "Outer Shells", es: "Capas Exteriores" }
+            { en: "Seasonal T-Shirts", es: "Camisetas Estacionales" },
+            { en: "Technical Vests", es: "Chalecos Técnicos" },
+            { en: "Accessories", es: "Accesorios" }
         ],
-        empty: mounted && isEs ? "ESENCIALES_AGOTADOS" : "ESSENTIALS_DEPLETED",
-        label: mounted && isEs ? "UTILIDAD" : "UTILITY"
+        empty: mounted && isEs ? "COLECCIÓN_AGOTADA" : "COLLECTION_SOLD_OUT",
+        label: mounted && isEs ? "ESTACIONAL" : "SEASONAL"
     };
 
     return (
@@ -35,7 +35,7 @@ export default function EssentialWearPage() {
             <CategoryHero
                 title={content.title}
                 subtitle={content.subtitle}
-                code="ESS_SEQUENCE"
+                code="SS25_SEQUENCE"
                 productCount={products.length}
             />
 
@@ -63,7 +63,7 @@ export default function EssentialWearPage() {
             <div className="max-w-7xl mx-auto w-full px-6 md:px-12 py-12">
                 <div className="pt-8 border-t border-black/10 flex justify-between items-center opacity-30">
                     <div className="flex gap-4">
-                        <span className="font-mono text-[8px]">[ ESS_WR ]</span>
+                        <span className="font-mono text-[8px]">[ SS_25 ]</span>
                         <span className="font-mono text-[8px] font-bold text-gold-muted">[ {content.label} ]</span>
                     </div>
                     <span className="font-mono text-[8px] tracking-[0.3em]">NEXUS_SYSTEM_ST_0.4</span>

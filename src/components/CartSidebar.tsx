@@ -3,7 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCartStore } from "@/lib/cart-store";
-import { useEffect } from "react";
+import { useSettingsStore } from "@/lib/settings-store";
+import { useEffect, useState } from "react";
+import { formatPrice } from "@/lib/products";
 
 export default function CartSidebar() {
     const {
@@ -15,9 +17,11 @@ export default function CartSidebar() {
         getTotalItems,
         getTotalPrice,
     } = useCartStore();
+    const { language, currency } = useSettingsStore();
+    const [mounted, setMounted] = useState(false);
 
-    // Lock body scroll when open
     useEffect(() => {
+        setMounted(true);
         if (isCartOpen) {
             document.body.style.overflow = "hidden";
         } else {
@@ -51,7 +55,7 @@ export default function CartSidebar() {
                     <div className="flex items-center gap-3">
                         <div className="w-1.5 h-1.5 rounded-full bg-gold-primary animate-pulse" />
                         <span className="font-heading text-sm font-bold tracking-[0.15em] uppercase">
-                            CART_INTERFACE
+                            {mounted && language === "ES" ? "CARRITO_INTERFACE" : "CART_INTERFACE"}
                         </span>
                         <span className="font-mono text-[9px] opacity-40">
                             [{totalItems.toString().padStart(2, "0")}]
@@ -74,10 +78,12 @@ export default function CartSidebar() {
                         <div className="flex flex-col items-center justify-center h-full text-center px-8">
                             <div className="w-16 h-px bg-black/15 mb-8" />
                             <h3 className="font-heading text-xl font-bold mb-3 opacity-60">
-                                EMPTY_QUEUE
+                                {mounted && language === "ES" ? "COLA_VACÍA" : "EMPTY_QUEUE"}
                             </h3>
                             <p className="font-mono text-[10px] opacity-40 tracking-[0.15em] max-w-[220px] leading-relaxed">
-                                NO ASSETS IN ACQUISITION PIPELINE. BROWSE THE COLLECTION TO ADD ITEMS.
+                                {mounted && language === "ES" 
+                                    ? "SIN ACTIVOS EN EL PROCESO DE ADQUISICIÓN. EXPLORA LA COLECCIÓN PARA AÑADIR PRODUCTOS." 
+                                    : "NO ASSETS IN ACQUISITION PIPELINE. BROWSE THE COLLECTION TO ADD ITEMS."}
                             </p>
                             <div className="w-16 h-px bg-black/15 mt-8" />
                             <button
@@ -152,9 +158,9 @@ export default function CartSidebar() {
                                             </div>
 
                                             {/* Price */}
-                                            <span className="font-mono text-sm font-bold">
-                                                {item.price}
-                                            </span>
+                                             <span className="font-mono text-sm font-bold">
+                                                 {mounted ? formatPrice(item.price, currency) : item.price}
+                                             </span>
                                         </div>
                                     </div>
                                 </div>
@@ -168,22 +174,22 @@ export default function CartSidebar() {
                     <div className="shrink-0 border-t border-black/10 bg-black/[0.02]">
                         {/* Summary */}
                         <div className="px-6 py-4 space-y-2">
+                             <div className="flex justify-between font-mono text-[10px] opacity-50">
+                                 <span>{mounted && language === "ES" ? "SUBTOTAL" : "SUBTOTAL"} ({totalItems} {mounted && language === "ES" ? (totalItems !== 1 ? "ARTÍCULOS" : "ARTÍCULO") : (totalItems !== 1 ? "ITEMS" : "ITEM")})</span>
+                                 <span>{mounted ? formatPrice(totalPrice.toString(), currency) : `$${totalPrice.toFixed(2)}`}</span>
+                             </div>
                             <div className="flex justify-between font-mono text-[10px] opacity-50">
-                                <span>SUBTOTAL ({totalItems} ITEM{totalItems !== 1 ? "S" : ""})</span>
-                                <span>${totalPrice.toFixed(2)}</span>
-                            </div>
-                            <div className="flex justify-between font-mono text-[10px] opacity-50">
-                                <span>SHIPPING</span>
-                                <span>COMPLIMENTARY</span>
+                                <span>{mounted && language === "ES" ? "ENVÍO" : "SHIPPING"}</span>
+                                <span>{mounted && language === "ES" ? "CORTESÍA" : "COMPLIMENTARY"}</span>
                             </div>
                             <div className="h-px bg-black/10" />
                             <div className="flex justify-between items-center">
                                 <span className="font-heading text-sm font-bold tracking-wide">
                                     TOTAL
                                 </span>
-                                <span className="font-heading text-xl font-black">
-                                    ${totalPrice.toFixed(2)}
-                                </span>
+                                 <span className="font-heading text-xl font-black">
+                                     {mounted ? formatPrice(totalPrice.toString(), currency) : `$${totalPrice.toFixed(2)}`}
+                                 </span>
                             </div>
                         </div>
 
@@ -194,20 +200,20 @@ export default function CartSidebar() {
                                 onClick={closeCart}
                                 className="w-full h-12 bg-black text-white font-mono text-[10px] tracking-[0.3em] uppercase sharp hover:bg-gold-primary transition-colors flex items-center justify-center no-underline"
                             >
-                                PROCEED_TO_CHECKOUT
+                                {mounted && language === "ES" ? "CONTINUAR_AL_PAGO" : "PROCEED_TO_CHECKOUT"}
                             </Link>
                             <button
                                 onClick={closeCart}
                                 className="w-full h-10 border border-black/20 font-mono text-[10px] tracking-[0.2em] uppercase sharp hover:border-black/50 transition-colors"
                             >
-                                CONTINUE_BROWSING
+                                {mounted && language === "ES" ? "CONTINUAR_COMPRANDO" : "CONTINUE_BROWSING"}
                             </button>
                         </div>
 
                         {/* Security Footer */}
                         <div className="px-6 pb-4 flex justify-center gap-6 font-mono text-[7px] opacity-30 uppercase tracking-widest">
-                            <span>🔒 SECURE_CHECKOUT</span>
-                            <span>ENCRYPTION: AES-256</span>
+                            <span>🔒 {mounted && language === "ES" ? "PAGO_SEGURO" : "SECURE_CHECKOUT"}</span>
+                            <span>{mounted && language === "ES" ? "ENCRIPTACIÓN" : "ENCRYPTION"}: AES-256</span>
                         </div>
                     </div>
                 )}

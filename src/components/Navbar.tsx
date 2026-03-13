@@ -5,14 +5,21 @@ import { useState, useEffect, useRef } from "react";
 import Menu from "./Menu";
 import SearchOverlay from "./SearchOverlay";
 import { useCartStore } from "@/lib/cart-store";
+import { useSettingsStore } from "@/lib/settings-store";
 
 export default function Navbar() {
+    const [mounted, setMounted] = useState(false);
     const [time, setTime] = useState("00:00:00");
     const [sessionSecs, setSessionSecs] = useState(0);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const { getTotalItems, openCart } = useCartStore();
+    const { language, currency, setLanguage, setCurrency } = useSettingsStore();
     const totalItems = getTotalItems();
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         if (isMenuOpen || isSearchOpen) {
@@ -25,9 +32,14 @@ export default function Navbar() {
     useEffect(() => {
         const timer = setInterval(() => {
             const now = new Date();
-            setTime(now.getUTCHours().toString().padStart(2, '0') + ":" +
-                now.getUTCMinutes().toString().padStart(2, '0') + ":" +
-                now.getUTCSeconds().toString().padStart(2, '0'));
+            const bogotaTime = now.toLocaleTimeString("en-GB", {
+                timeZone: "America/Bogota",
+                hour12: false,
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit"
+            });
+            setTime(bogotaTime);
             setSessionSecs(s => s + 1);
         }, 1000);
         return () => clearInterval(timer);
@@ -61,17 +73,17 @@ export default function Navbar() {
                 <div className="flex w-full industrial-border-b font-mono text-[9px] wide-tracking h-8 items-center uppercase overflow-hidden">
                     <div className={`w-1/4 industrial-border-r h-full flex items-center justify-center gap-3 px-4 mercury-border ${mercuryClass}`}>
                         <span className="opacity-50 text-[7px] animate-pulse">●</span>
-                        <span>UTC_{time}</span>
+                        <span>BOG_{mounted ? time : "00:00:00"}</span>
                         <span className="opacity-30">|</span>
-                        <span>SESSION_{formatSession(sessionSecs)}</span>
+                        <span>SESSION_{mounted ? formatSession(sessionSecs) : "00:00s"}</span>
                     </div>
 
                     <div className={`flex-[1.5] text-center px-4 industrial-border-r h-full flex items-center justify-center mercury-border ${mercuryClass}`}>
-                        NEW IN: CYBER VALENTINE&apos;S COLLECTION // ACCESS_GRANTED
+                        {!mounted ? "NEXUS SAINT // ACCESS_GRANTED" : (language === "EN" ? "NEW IN: SPRING/SUMMER '25 COLLECTION // ACCESS_GRANTED" : "NOVEDADES: COLECCIÓN SPRING/SUMMER '25 // ACCESO_CONCEDIDO")}
                     </div>
 
                     <div className={`w-1/3 text-center px-4 h-full flex items-center justify-center mercury-border ${mercuryClass}`}>
-                        COMPLIMENTARY WORLDWIDE SHIPPING // [ STATUS: OPERATIONAL ]
+                        {!mounted ? "COMPLIMENTARY WORLDWIDE SHIPPING" : (language === "EN" ? "COMPLIMENTARY WORLDWIDE SHIPPING // [ STATUS: OPERATIONAL ]" : "ENVÍO MUNDIAL DE CORTESÍA // [ ESTADO: OPERATIVO ]")}
                     </div>
                 </div>
 
@@ -83,7 +95,7 @@ export default function Navbar() {
                         className={`w-1/4 h-full industrial-border-r flex items-center px-6 gap-2 hover:bg-black/5 cursor-pointer transition-colors mercury-border ${mercuryClass}`}
                     >
                         <div className="w-1.5 h-1.5 rounded-full bg-black"></div>
-                        <span>MENU</span>
+                        <span>{mounted && language === "ES" ? "MENÚ" : "MENU"}</span>
                     </div>
 
                     {/* Brand Protagonist (Centered) */}
@@ -97,13 +109,23 @@ export default function Navbar() {
                             onClick={() => setIsSearchOpen(true)}
                             className={`flex-1 h-full industrial-border-l flex items-center justify-center gap-2 hover:bg-black/5 cursor-pointer transition-colors mercury-border ${mercuryClass}`}
                         >
-                            <span>SEARCH</span>
+                            <span>{mounted && language === "ES" ? "BUSCAR" : "SEARCH"}</span>
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         </div>
 
-                        <div className={`flex-1 h-full industrial-border-l flex items-center justify-center gap-2 hover:bg-black/5 cursor-pointer transition-colors mercury-border ${mercuryClass}`}>
-                            <span>EN ⌄</span>
-                            <span>COP ⌄</span>
+                        <div className={`flex-1 h-full industrial-border-l flex items-center justify-center gap-4 hover:bg-black/5 transition-colors mercury-border ${mercuryClass}`}>
+                            <button
+                                onClick={() => setLanguage(language === "EN" ? "ES" : "EN")}
+                                className="hover:text-gold-primary transition-colors cursor-pointer"
+                            >
+                                {mounted ? language : "EN"} ⌄
+                            </button>
+                            <button
+                                onClick={() => setCurrency(currency === "USD" ? "COP" : "USD")}
+                                className="hover:text-gold-primary transition-colors cursor-pointer"
+                            >
+                                {mounted ? currency : "USD"} ⌄
+                            </button>
                         </div>
 
                         <div
@@ -111,7 +133,7 @@ export default function Navbar() {
                             className={`flex-1 h-full industrial-border-l flex items-center justify-center gap-2 hover:bg-black/5 cursor-pointer transition-colors font-bold mercury-border ${mercuryClass} ${totalItems > 0 ? "text-gold-primary" : ""}`}
                         >
                             <div className={`w-1.5 h-1.5 rounded-full ${totalItems > 0 ? "bg-gold-primary animate-pulse" : "bg-black"}`}></div>
-                            <span>CART [{totalItems}]</span>
+                            <span>{mounted && language === "ES" ? "CARRITO" : "CART"} [{totalItems}]</span>
                         </div>
                     </div>
                 </nav>

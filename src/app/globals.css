@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --color-gold-primary: #D4AF37;
-  --color-gold-vibrant: #FFD700;
-  --color-gold-muted: #8E7618;
-  --color-gold-glow: rgba(212, 175, 55, 0.3);
+  --color-gold-primary: #FF5E00;
+  --color-gold-vibrant: #FF7300;
+  --color-gold-muted: #B34200;
+  --color-gold-glow: rgba(255, 94, 0, 0.3);
 }
 
 :root {

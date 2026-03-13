@@ -1,9 +1,21 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
-const PRODUCTS = [
+interface Product {
+    id: string;
+    name: string;
+    category: string;
+    price: string;
+    image: string;
+    status: string;
+    details: string;
+}
+
+const LOCAL_PRODUCTS: Product[] = [
     {
         id: "st-001",
         name: "CORE T-SHIRT // NOIR",
@@ -61,7 +73,33 @@ const PRODUCTS = [
 ];
 
 export default function ProductGrid() {
+    const [products, setProducts] = useState<Product[]>(LOCAL_PRODUCTS);
     const [hoveredId, setHoveredId] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchProducts() {
+            try {
+                // Initial attempt to fetch from Supabase
+                const { data, error } = await supabase
+                    .from('products')
+                    .select('*');
+
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    setProducts(data);
+                }
+            } catch (err) {
+                console.error("Supabase link inactive or table missing, using local assets:", err);
+                // Fallback to LOCAL_PRODUCTS (already set by default)
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        fetchProducts();
+    }, []);
 
     return (
         <section className="relative w-full py-24 px-6 md:px-12 bg-transparent overflow-hidden">
@@ -81,17 +119,23 @@ export default function ProductGrid() {
                     <span className="font-mono text-[10px] text-gold-muted tracking-[0.3em] uppercase mb-2">
                         ST_COLLECTION // SERIES_01
                     </span>
-                    <h2 className="text-4xl md:text-5xl font-heading font-black tracking-tighter">
-                        CURATED_GEAR
-                    </h2>
+                    <div className="flex items-center gap-4">
+                        <h2 className="text-4xl md:text-5xl font-heading font-black tracking-tighter">
+                            CURATED_GEAR
+                        </h2>
+                        {isLoading && (
+                            <div className="h-1 w-12 bg-gold-primary animate-pulse rounded-full" />
+                        )}
+                    </div>
                 </div>
 
                 {/* Product Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-16 gap-x-8">
-                    {PRODUCTS.map((product) => (
-                        <div
+                    {products.map((product) => (
+                        <Link
                             key={product.id}
-                            className="group relative flex flex-col cursor-pointer"
+                            href={`/product/${product.id}`}
+                            className="group relative flex flex-col cursor-pointer no-underline"
                             onMouseEnter={() => setHoveredId(product.id)}
                             onMouseLeave={() => setHoveredId(null)}
                         >
@@ -156,7 +200,7 @@ export default function ProductGrid() {
                                     ACQUIRE_ASSET
                                 </button>
                             </div>
-                        </div>
+                        </Link>
                     ))}
                 </div>
 
@@ -173,3 +217,4 @@ export default function ProductGrid() {
         </section>
     );
 }
+

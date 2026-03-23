@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCartStore } from "@/lib/cart-store";
@@ -15,6 +15,7 @@ export default function CheckoutPage() {
     const [paymentMethod, setPaymentMethod] = useState<"stripe" | "mercadopago">("stripe");
     const [isProcessing, setIsProcessing] = useState(false);
     const [orderNumber, setOrderNumber] = useState("");
+    const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
     const [form, setForm] = useState({
         email: "",
@@ -39,8 +40,9 @@ export default function CheckoutPage() {
         setStep("payment");
     };
 
-    const handlePayment = async () => {
+    const handlePayment = useCallback(async () => {
         setIsProcessing(true);
+        setCheckoutError(null);
         try {
             const res = await fetch("/api/checkout", {
                 method: "POST",
@@ -61,28 +63,31 @@ export default function CheckoutPage() {
 
             const data = await res.json();
 
+            if (!res.ok) {
+                // SECURITY: El backend rechazó la request (ej: precio manipulado)
+                throw new Error(data.error || `Server error (${res.status})`);
+            }
+
             if (data.url) {
-                // Redirect to Stripe Checkout
+                // Redirect to Stripe/MercadoPago Checkout
                 window.location.href = data.url;
             } else if (data.orderId) {
-                // Fallback: direct confirmation (when Stripe is not configured)
+                // Fallback: direct confirmation (when payment gateway is not configured)
                 setOrderNumber(data.orderId);
                 clearCart();
                 setStep("confirmation");
             } else {
-                throw new Error(data.error || "Payment failed");
+                throw new Error("Unexpected response from payment server");
             }
         } catch (err) {
+            // CORRECCIÓN: NO mostrar confirmación falsa. Mantener el carrito intacto.
             console.error("Checkout error:", err);
-            // Show confirmation anyway for demo purposes
-            const demoOrderId = "NXST-" + Date.now().toString(36).toUpperCase();
-            setOrderNumber(demoOrderId);
-            clearCart();
-            setStep("confirmation");
+            const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
+            setCheckoutError(errorMessage);
         } finally {
             setIsProcessing(false);
         }
-    };
+    }, [items, form, totalPrice, paymentMethod, clearCart]);
 
     // Empty cart guard
     if (items.length === 0 && step !== "confirmation") {
@@ -382,6 +387,20 @@ export default function CheckoutPage() {
                                             </p>
                                         </div>
                                     </div>
+
+                                    {/* Error Display */}
+                                    {checkoutError && (
+                                        <div className="border border-red-500/30 bg-red-500/5 p-4 mt-4">
+                                            <span className="font-mono text-[9px] text-red-600 tracking-[0.2em] uppercase block mb-1">TRANSACTION_ERROR</span>
+                                            <p className="font-mono text-sm text-red-700">{checkoutError}</p>
+                                            <button
+                                                onClick={() => setCheckoutError(null)}
+                                                className="font-mono text-[9px] text-red-500 tracking-[0.2em] uppercase hover:underline mt-2"
+                                            >
+                                                DISMISS
+                                            </button>
+                                        </div>
+                                    )}
 
                                     <div className="flex flex-col gap-4 mt-8">
                                         <div className="flex gap-4">

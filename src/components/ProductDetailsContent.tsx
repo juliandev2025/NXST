@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { useCartStore } from "@/lib/cart-store";
@@ -46,20 +46,20 @@ const SIZE_GUIDE: Record<string, Record<string, Record<string, string>>> = {
 };
 
 export default function ProductDetailsContent({ initialProduct }: { initialProduct: Product }) {
-    if (!initialProduct) return null;
-    const params = useParams();
+    // HOOKS PRIMERO: React requiere que los hooks se llamen siempre en el mismo orden.
     const router = useRouter();
     const { addItem } = useCartStore();
-
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
     const [sizeError, setSizeError] = useState(false);
     const [openAccordion, setOpenAccordion] = useState<string | null>(null);
     const [sizeUnit, setSizeUnit] = useState<"cm" | "in">("cm");
     const [addedFeedback, setAddedFeedback] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
     const { language, currency } = useSettingsStore();
     const [mounted, setMounted] = useState(false);
+
+    // Guard DESPUÉS de los hooks
+    if (!initialProduct) return null;
 
     const productImages = initialProduct.images || [initialProduct.image];
 
@@ -317,9 +317,9 @@ export default function ProductDetailsContent({ initialProduct }: { initialProdu
                                         <div className="space-y-4 font-mono text-[11px] opacity-70 leading-relaxed">
                                             <div>
                                                 <p className="font-medium opacity-100 mb-1">{mounted && language === "ES" ? "Envío" : "Shipping"}</p>
-                                                <p>{mounted && language === "ES" ? "Envío estándar: Gratis en todos los pedidos" : "Standard shipping: Free on all orders"}</p>
-                                                <p>{mounted && language === "ES" ? "Envío express: $15.00 USD" : "Express shipping: $15.00 USD"}</p>
-                                                <p>{mounted && language === "ES" ? "Entrega estimada: 5–10 días hábiles" : "Estimated delivery: 5–10 business days"}</p>
+                                                <p>{mounted && language === "ES" ? "Envío estándar: Gratis en toda Colombia" : "Standard shipping: Free across Colombia"}</p>
+                                                <p>{mounted && language === "ES" ? "Envío express: $15.000 COP" : "Express shipping: $15,000 COP"}</p>
+                                                <p>{mounted && language === "ES" ? "Entrega estimada: 3–5 días hábiles" : "Estimated delivery: 3–5 business days"}</p>
                                             </div>
                                             <div>
                                                 <p className="font-medium opacity-100 mb-1">{mounted && language === "ES" ? "Devoluciones" : "Returns"}</p>

@@ -5,10 +5,132 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCartStore } from "@/lib/cart-store";
 import { useRouter } from "next/navigation";
+import { useSettingsStore } from "@/lib/settings-store";
+import { useMounted } from "@/lib/hooks";
+import { formatPrice } from "@/lib/products";
 
 type CheckoutStep = "information" | "payment" | "confirmation";
 
+const TRANSLATIONS = {
+    EN: {
+        breadcrumb_home: "HOME",
+        breadcrumb_checkout: "CHECKOUT",
+        step_information: "information",
+        step_payment: "payment",
+        step_confirmation: "confirmation",
+        // Information Step
+        step_01: "STEP_01",
+        contact_info: "CONTACT_INFO",
+        email_address: "EMAIL_ADDRESS",
+        first_name: "FIRST_NAME",
+        last_name: "LAST_NAME",
+        step_01b: "STEP_01B",
+        shipping_coords: "SHIPPING_COORDS",
+        address: "ADDRESS",
+        city: "CITY",
+        country: "COUNTRY",
+        postal_code: "POSTAL_CODE",
+        phone: "PHONE",
+        proceed_to_payment: "PROCEED_TO_PAYMENT →",
+        // Payment Step
+        step_02: "STEP_02",
+        payment_gateway: "PAYMENT_GATEWAY",
+        delivery_to: "DELIVERY_TO",
+        modify_coords: "MODIFY_COORDS",
+        select_payment_gateway: "SELECT_PAYMENT_GATEWAY",
+        stripe_desc: "SECURE INTERNATIONAL PAYMENT GATEWAY",
+        mercadopago_desc: "IDEAL FOR PAYMENTS IN LATIN AMERICA (COL / MEX / ARG / BRA)",
+        transaction_error: "TRANSACTION_ERROR",
+        dismiss: "DISMISS",
+        back: "← BACK",
+        initialize_acquisition: "INITIALIZE_ACQUISITION",
+        authorisation_note: "By confirming, you authorize the secure transaction protocol through the selected gateway.",
+        processing: "PROCESSING_",
+        // Confirmation Step
+        transaction_complete: "TRANSACTION_COMPLETE",
+        order_confirmed: "ORDER_CONFIRMED",
+        confirmation_desc: "Your assets are being prepared for deployment. You will receive a confirmation at your registered email.",
+        order_reference: "ORDER_REFERENCE",
+        return_to_base: "RETURN_TO_BASE",
+        // Sidebar
+        order_manifest: "ORDER_MANIFEST",
+        asset: "ASSET",
+        assets: "ASSETS",
+        subtotal: "SUBTOTAL",
+        shipping: "SHIPPING",
+        total: "TOTAL",
+        // Empty Cart
+        empty_pipeline: "EMPTY_PIPELINE",
+        no_assets: "NO ASSETS QUEUED FOR ACQUISITION",
+        colombia: "Colombia",
+        mexico: "Mexico",
+        usa: "United States",
+        spain: "Spain",
+        argentina: "Argentina",
+    },
+    ES: {
+        breadcrumb_home: "INICIO",
+        breadcrumb_checkout: "PAGO",
+        step_information: "información",
+        step_payment: "pago",
+        step_confirmation: "confirmación",
+        // Information Step
+        step_01: "PASO_01",
+        contact_info: "INFOR_CONTACTO",
+        email_address: "CORREO_ELECTRÓNICO",
+        first_name: "NOMBRE",
+        last_name: "APELLIDO",
+        step_01b: "PASO_01B",
+        shipping_coords: "COORDENADAS_ENVÍO",
+        address: "DIRECCIÓN",
+        city: "CIUDAD",
+        country: "PAÍS",
+        postal_code: "CÓDIGO_POSTAL",
+        phone: "TELÉFONO",
+        proceed_to_payment: "PROCEDER_AL_PAGO →",
+        // Payment Step
+        step_02: "PASO_02",
+        payment_gateway: "PASARELA_DE_PAGO",
+        delivery_to: "ENTREGA_A",
+        modify_coords: "MODIFICAR_COORDENADAS",
+        select_payment_gateway: "SELECCIONAR_PASARELA",
+        stripe_desc: "PASARELA DE PAGO INTERNACIONAL SEGURA",
+        mercadopago_desc: "IDEAL PARA PAGOS EN LATINOAMÉRICA (COL / MEX / ARG / BRA)",
+        transaction_error: "ERROR_TRANSACCIÓN",
+        dismiss: "DESCARTAR",
+        back: "← VOLVER",
+        initialize_acquisition: "INICIALIZAR_ADQUISICIÓN",
+        authorisation_note: "Al confirmar, autorizas el protocolo de transacción segura a través de la pasarela seleccionada.",
+        processing: "PROCESANDO_",
+        // Confirmation Step
+        transaction_complete: "TRANSACCIÓN_COMPLETA",
+        order_confirmed: "ORDEN_CONFIRMADA",
+        confirmation_desc: "Tus activos están siendo preparados para el despliegue. Recibirás una conﬁrmación en tu correo registrado.",
+        order_reference: "REFERENCIA_ORDEN",
+        return_to_base: "VOLVER_A_LA_BASE",
+        // Sidebar
+        order_manifest: "MANIFIESTO_ORDEN",
+        asset: "ACTIVO",
+        assets: "ACTIVOS",
+        subtotal: "SUBTOTAL",
+        shipping: "ENVÍO",
+        total: "TOTAL",
+        // Empty Cart
+        empty_pipeline: "PIPELINE_VACÍO",
+        no_assets: "SIN ACTIVOS EN COLA PARA ADQUISICIÓN",
+        colombia: "Colombia",
+        mexico: "México",
+        usa: "Estados Unidos",
+        spain: "España",
+        argentina: "Argentina",
+    }
+};
+
 export default function CheckoutPage() {
+    const mounted = useMounted();
+    const { language, currency } = useSettingsStore();
+    const t = TRANSLATIONS[language];
+
     const router = useRouter();
     const { items, getTotalItems, getTotalPrice, clearCart } = useCartStore();
     const [step, setStep] = useState<CheckoutStep>("information");
@@ -29,7 +151,10 @@ export default function CheckoutPage() {
     });
 
     const totalItems = getTotalItems();
-    const totalPrice = getTotalPrice();
+    const totalPrice = getTotalPrice(); // Base USD
+
+    // Helper to format prices correctly for UI
+    const getFormatted = (usdStr: string) => formatPrice(usdStr, currency);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -64,15 +189,12 @@ export default function CheckoutPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                // SECURITY: El backend rechazó la request (ej: precio manipulado)
                 throw new Error(data.error || `Server error (${res.status})`);
             }
 
             if (data.url) {
-                // Redirect to Stripe/MercadoPago Checkout
                 window.location.href = data.url;
             } else if (data.orderId) {
-                // Fallback: direct confirmation (when payment gateway is not configured)
                 setOrderNumber(data.orderId);
                 clearCart();
                 setStep("confirmation");
@@ -80,7 +202,6 @@ export default function CheckoutPage() {
                 throw new Error("Unexpected response from payment server");
             }
         } catch (err) {
-            // CORRECCIÓN: NO mostrar confirmación falsa. Mantener el carrito intacto.
             console.error("Checkout error:", err);
             const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
             setCheckoutError(errorMessage);
@@ -89,21 +210,23 @@ export default function CheckoutPage() {
         }
     }, [items, form, totalPrice, paymentMethod, clearCart]);
 
+    if (!mounted) return null;
+
     // Empty cart guard
     if (items.length === 0 && step !== "confirmation") {
         return (
             <div className="flex flex-col min-h-screen">
                 <div className="flex-1 flex flex-col items-center justify-center p-8">
                     <div className="w-16 h-px bg-black/20 mb-8" />
-                    <h1 className="font-heading text-3xl font-bold mb-4">EMPTY_PIPELINE</h1>
+                    <h1 className="font-heading text-3xl font-bold mb-4">{t.empty_pipeline}</h1>
                     <p className="font-mono text-[10px] opacity-50 tracking-[0.2em] mb-8">
-                        NO ASSETS QUEUED FOR ACQUISITION
+                        {t.no_assets}
                     </p>
                     <Link
                         href="/"
                         className="mercury-btn px-12 py-4 font-mono text-[10px] tracking-[0.2em] uppercase sharp no-underline"
                     >
-                        <span className="relative z-10">RETURN_TO_BASE</span>
+                        <span className="relative z-10">{t.return_to_base}</span>
                         <div className="btn-shine" />
                     </Link>
                 </div>
@@ -113,13 +236,13 @@ export default function CheckoutPage() {
 
     return (
         <div className="flex flex-col min-h-screen">
-            <main className="flex-1 py-8 px-6 md:px-12">
+            <main className="flex-1 py-6 md:py-8 px-4 md:px-12">
                 <div className="max-w-6xl mx-auto">
                     {/* Breadcrumb */}
                     <div className="flex items-center gap-2 mb-10 font-mono text-[9px] opacity-40 tracking-[0.3em] uppercase">
-                        <Link href="/" className="hover:opacity-100 transition-opacity">HOME</Link>
+                        <Link href="/" className="hover:opacity-100 transition-opacity">{t.breadcrumb_home}</Link>
                         <span>/</span>
-                        <span className="text-gold-primary opacity-100">CHECKOUT</span>
+                        <span className="text-gold-primary opacity-100">{t.breadcrumb_checkout}</span>
                     </div>
 
                     {/* Progress Steps */}
@@ -142,7 +265,7 @@ export default function CheckoutPage() {
                                             className={`font-mono text-[8px] tracking-[0.15em] uppercase hidden sm:block ${step === s ? "opacity-100" : "opacity-30"
                                                 }`}
                                         >
-                                            {s}
+                                            {t[`step_${s}` as keyof typeof t]}
                                         </span>
                                     </div>
                                     {i < 2 && (
@@ -161,17 +284,17 @@ export default function CheckoutPage() {
                                 <form onSubmit={handleSubmitInfo} className="space-y-8">
                                     <div className="border-l-2 border-gold-primary pl-6">
                                         <span className="font-mono text-[10px] text-gold-muted tracking-[0.3em] uppercase block mb-2">
-                                            STEP_01
+                                            {t.step_01}
                                         </span>
-                                        <h2 className="font-heading text-3xl font-black tracking-tighter">
-                                            CONTACT_INFO
+                                        <h2 className="font-heading text-xl md:text-3xl font-black tracking-tighter">
+                                            {t.contact_info}
                                         </h2>
                                     </div>
 
                                     <div className="space-y-4">
                                         <div>
                                             <label className="font-mono text-[9px] opacity-50 tracking-[0.2em] uppercase block mb-2">
-                                                EMAIL_ADDRESS
+                                                {t.email_address}
                                             </label>
                                             <input
                                                 type="email"
@@ -187,7 +310,7 @@ export default function CheckoutPage() {
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
                                                 <label className="font-mono text-[9px] opacity-50 tracking-[0.2em] uppercase block mb-2">
-                                                    FIRST_NAME
+                                                    {t.first_name}
                                                 </label>
                                                 <input
                                                     type="text"
@@ -200,7 +323,7 @@ export default function CheckoutPage() {
                                             </div>
                                             <div>
                                                 <label className="font-mono text-[9px] opacity-50 tracking-[0.2em] uppercase block mb-2">
-                                                    LAST_NAME
+                                                    {t.last_name}
                                                 </label>
                                                 <input
                                                     type="text"
@@ -216,17 +339,17 @@ export default function CheckoutPage() {
 
                                     <div className="border-l-2 border-gold-primary pl-6 mt-12">
                                         <span className="font-mono text-[10px] text-gold-muted tracking-[0.3em] uppercase block mb-2">
-                                            STEP_01B
+                                            {t.step_01b}
                                         </span>
-                                        <h2 className="font-heading text-3xl font-black tracking-tighter">
-                                            SHIPPING_COORDS
+                                        <h2 className="font-heading text-xl md:text-3xl font-black tracking-tighter">
+                                            {t.shipping_coords}
                                         </h2>
                                     </div>
 
                                     <div className="space-y-4">
                                         <div>
                                             <label className="font-mono text-[9px] opacity-50 tracking-[0.2em] uppercase block mb-2">
-                                                ADDRESS
+                                                {t.address}
                                             </label>
                                             <input
                                                 type="text"
@@ -238,10 +361,10 @@ export default function CheckoutPage() {
                                             />
                                         </div>
 
-                                        <div className="grid grid-cols-3 gap-4">
+                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                             <div>
                                                 <label className="font-mono text-[9px] opacity-50 tracking-[0.2em] uppercase block mb-2">
-                                                    CITY
+                                                    {t.city}
                                                 </label>
                                                 <input
                                                     type="text"
@@ -254,7 +377,7 @@ export default function CheckoutPage() {
                                             </div>
                                             <div>
                                                 <label className="font-mono text-[9px] opacity-50 tracking-[0.2em] uppercase block mb-2">
-                                                    COUNTRY
+                                                    {t.country}
                                                 </label>
                                                 <select
                                                     name="country"
@@ -262,16 +385,12 @@ export default function CheckoutPage() {
                                                     onChange={handleInputChange}
                                                     className="w-full bg-transparent border border-black/15 px-4 py-3 font-mono text-sm focus:border-gold-primary focus:outline-none transition-colors sharp"
                                                 >
-                                                    <option value="Colombia">Colombia</option>
-                                                    <option value="Mexico">México</option>
-                                                    <option value="USA">United States</option>
-                                                    <option value="Spain">España</option>
-                                                    <option value="Argentina">Argentina</option>
+                                                    <option value="Colombia">{t.colombia}</option>
                                                 </select>
                                             </div>
                                             <div>
                                                 <label className="font-mono text-[9px] opacity-50 tracking-[0.2em] uppercase block mb-2">
-                                                    POSTAL_CODE
+                                                    {t.postal_code}
                                                 </label>
                                                 <input
                                                     type="text"
@@ -286,7 +405,7 @@ export default function CheckoutPage() {
 
                                         <div>
                                             <label className="font-mono text-[9px] opacity-50 tracking-[0.2em] uppercase block mb-2">
-                                                PHONE
+                                                {t.phone}
                                             </label>
                                             <input
                                                 type="tel"
@@ -303,7 +422,7 @@ export default function CheckoutPage() {
                                         type="submit"
                                         className="w-full h-14 bg-black text-white font-mono text-[10px] tracking-[0.3em] uppercase sharp hover:bg-gold-primary transition-colors mt-8"
                                     >
-                                        PROCEED_TO_PAYMENT →
+                                        {t.proceed_to_payment}
                                     </button>
                                 </form>
                             )}
@@ -313,17 +432,17 @@ export default function CheckoutPage() {
                                 <div className="space-y-8">
                                     <div className="border-l-2 border-gold-primary pl-6">
                                         <span className="font-mono text-[10px] text-gold-muted tracking-[0.3em] uppercase block mb-2">
-                                            STEP_02
+                                            {t.step_02}
                                         </span>
                                         <h2 className="font-heading text-3xl font-black tracking-tighter">
-                                            PAYMENT_GATEWAY
+                                            {t.payment_gateway}
                                         </h2>
                                     </div>
 
                                     {/* Order Summary in Payment */}
                                     <div className="border border-black/10 p-6 space-y-4">
                                         <span className="font-mono text-[9px] opacity-40 tracking-[0.2em] uppercase block">
-                                            DELIVERY_TO
+                                            {t.delivery_to}
                                         </span>
                                         <div className="font-mono text-sm">
                                             <p className="font-bold">{form.firstName} {form.lastName}</p>
@@ -335,14 +454,14 @@ export default function CheckoutPage() {
                                             onClick={() => setStep("information")}
                                             className="font-mono text-[9px] text-gold-primary tracking-[0.2em] uppercase hover:underline"
                                         >
-                                            MODIFY_COORDS
+                                            {t.modify_coords}
                                         </button>
                                     </div>
 
                                     {/* Payment Methods */}
                                     <div className="space-y-4">
                                         <span className="font-mono text-[9px] opacity-50 tracking-[0.2em] uppercase block">
-                                            SELECT_PAYMENT_GATEWAY
+                                            {t.select_payment_gateway}
                                         </span>
 
                                         <div 
@@ -363,7 +482,7 @@ export default function CheckoutPage() {
                                                 </div>
                                             </div>
                                             <p className="font-mono text-[9px] opacity-40 mt-2 ml-6 uppercase">
-                                                SECURE INTERNATIONAL PAYMENT GATEWAY
+                                                {t.stripe_desc}
                                             </p>
                                         </div>
 
@@ -383,7 +502,7 @@ export default function CheckoutPage() {
                                                 </div>
                                             </div>
                                             <p className="font-mono text-[9px] opacity-60 mt-2 ml-6 text-gold-muted uppercase">
-                                                IDEAL FOR PAYMENTS IN LATIN AMERICA (COL / MEX / ARG / BRA)
+                                                {t.mercadopago_desc}
                                             </p>
                                         </div>
                                     </div>
@@ -391,24 +510,24 @@ export default function CheckoutPage() {
                                     {/* Error Display */}
                                     {checkoutError && (
                                         <div className="border border-red-500/30 bg-red-500/5 p-4 mt-4">
-                                            <span className="font-mono text-[9px] text-red-600 tracking-[0.2em] uppercase block mb-1">TRANSACTION_ERROR</span>
+                                            <span className="font-mono text-[9px] text-red-600 tracking-[0.2em] uppercase block mb-1">{t.transaction_error}</span>
                                             <p className="font-mono text-sm text-red-700">{checkoutError}</p>
                                             <button
                                                 onClick={() => setCheckoutError(null)}
                                                 className="font-mono text-[9px] text-red-500 tracking-[0.2em] uppercase hover:underline mt-2"
                                             >
-                                                DISMISS
+                                                {t.dismiss}
                                             </button>
                                         </div>
                                     )}
 
                                     <div className="flex flex-col gap-4 mt-8">
-                                        <div className="flex gap-4">
+                                        <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                                             <button
                                                 onClick={() => setStep("information")}
                                                 className="flex-1 h-14 border border-black/20 font-mono text-[10px] tracking-[0.2em] uppercase sharp hover:border-black/50 transition-colors"
                                             >
-                                                ← BACK
+                                                {t.back}
                                             </button>
                                             <button
                                                 onClick={handlePayment}
@@ -418,15 +537,15 @@ export default function CheckoutPage() {
                                                 {isProcessing ? (
                                                     <>
                                                         <div className="h-1 w-8 bg-white animate-pulse rounded-full" />
-                                                        PROCESSING_
+                                                        {t.processing}
                                                     </>
                                                 ) : (
-                                                    <>INITIALIZE_ACQUISITION // ${totalPrice.toFixed(2)}</>
+                                                    <>{t.initialize_acquisition} // {getFormatted(totalPrice.toFixed(2))}</>
                                                 )}
                                             </button>
                                         </div>
                                         <p className="text-center font-mono text-[8px] opacity-30 uppercase tracking-[0.2em]">
-                                            By confirming, you authorize the secure transaction protocol through the selected gateway.
+                                            {t.authorisation_note}
                                         </p>
                                     </div>
                                 </div>
@@ -442,19 +561,19 @@ export default function CheckoutPage() {
                                             </svg>
                                         </div>
                                         <span className="font-mono text-[10px] text-gold-muted tracking-[0.4em] uppercase block mb-4">
-                                            TRANSACTION_COMPLETE
+                                            {t.transaction_complete}
                                         </span>
                                         <h2 className="font-heading text-4xl md:text-5xl font-black tracking-tighter mb-4">
-                                            ORDER_CONFIRMED
+                                            {t.order_confirmed}
                                         </h2>
                                         <p className="font-mono text-sm opacity-60 max-w-md">
-                                            Your assets are being prepared for deployment. You will receive a confirmation at your registered email.
+                                            {t.confirmation_desc}
                                         </p>
                                     </div>
 
                                     <div className="border border-black/10 p-6 max-w-sm mx-auto">
                                         <span className="font-mono text-[9px] opacity-40 tracking-[0.2em] uppercase block mb-3">
-                                            ORDER_REFERENCE
+                                            {t.order_reference}
                                         </span>
                                         <span className="font-heading text-2xl font-black text-gold-primary">
                                             {orderNumber}
@@ -465,7 +584,7 @@ export default function CheckoutPage() {
                                         href="/"
                                         className="inline-block mt-8 mercury-btn px-12 py-4 font-mono text-[10px] tracking-[0.2em] uppercase sharp no-underline"
                                     >
-                                        <span className="relative z-10">RETURN_TO_BASE</span>
+                                        <span className="relative z-10">{t.return_to_base}</span>
                                         <div className="btn-shine" />
                                     </Link>
                                 </div>
@@ -478,7 +597,7 @@ export default function CheckoutPage() {
                                 <div className="border border-black/10 sticky top-28">
                                     <div className="px-6 py-4 border-b border-black/10">
                                         <span className="font-mono text-[9px] opacity-40 tracking-[0.2em] uppercase">
-                                            ORDER_MANIFEST // {totalItems} ASSET{totalItems !== 1 ? "S" : ""}
+                                            {t.order_manifest} // {totalItems} {totalItems === 1 ? t.asset : t.assets}
                                         </span>
                                     </div>
 
@@ -501,7 +620,7 @@ export default function CheckoutPage() {
                                                         {item.name}
                                                     </span>
                                                     <span className="font-mono text-xs font-bold">
-                                                        {item.price}
+                                                        {getFormatted(item.price)}
                                                     </span>
                                                 </div>
                                             </div>
@@ -510,17 +629,17 @@ export default function CheckoutPage() {
 
                                     <div className="px-6 py-4 border-t border-black/10 space-y-2">
                                         <div className="flex justify-between font-mono text-[10px] opacity-50">
-                                            <span>SUBTOTAL</span>
-                                            <span>${totalPrice.toFixed(2)}</span>
+                                            <span>{t.subtotal}</span>
+                                            <span>{getFormatted(totalPrice.toFixed(2))}</span>
                                         </div>
                                         <div className="flex justify-between font-mono text-[10px] opacity-50">
-                                            <span>SHIPPING</span>
-                                            <span>$0.00</span>
+                                            <span>{t.shipping}</span>
+                                            <span>{getFormatted("$0.00")}</span>
                                         </div>
                                         <div className="h-px bg-black/10" />
                                         <div className="flex justify-between items-center pt-1">
-                                            <span className="font-heading text-sm font-bold">TOTAL</span>
-                                            <span className="font-heading text-xl font-black">${totalPrice.toFixed(2)}</span>
+                                            <span className="font-heading text-sm font-bold">{t.total}</span>
+                                            <span className="font-heading text-xl font-black">{getFormatted(totalPrice.toFixed(2))}</span>
                                         </div>
                                     </div>
                                 </div>

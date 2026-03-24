@@ -14,7 +14,7 @@ export default function EdgeDecorations() {
     return (
         <div className="fixed inset-0 pointer-events-none z-[5] overflow-hidden">
 
-            <div className="absolute left-6 top-1/2 -translate-y-1/2 flex flex-col items-center gap-16 opacity-10 hidden xl:flex">
+            <div className="absolute left-6 top-1/2 -translate-y-1/2 flex flex-col items-center gap-16 opacity-10 hidden md:flex">
                 <div className="vertical-text font-mono text-[7px] tracking-[0.4em] uppercase whitespace-nowrap">
                     SYSTEM_ACTIVE // システム稼働中
                 </div>
@@ -25,7 +25,7 @@ export default function EdgeDecorations() {
             </div>
 
 
-            <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col items-center gap-16 opacity-10 hidden xl:flex">
+            <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col items-center gap-16 opacity-10 hidden md:flex">
                 <div className="vertical-text font-mono text-[7px] tracking-[0.4em] uppercase whitespace-nowrap text-right">
                     SECURED_STREAM // 接続済み
                 </div>
@@ -36,7 +36,7 @@ export default function EdgeDecorations() {
             </div>
 
 
-            <div className="absolute left-10 bottom-12 opacity-5 hidden md:block">
+            <div className="absolute left-4 md:left-10 bottom-6 md:bottom-12 opacity-5 block">
                 <div className="font-mono text-[6px] leading-relaxed space-y-1 uppercase tracking-[0.2em]">
                     <div>OS_KRNL: NEXUS_ST_v0.4.2</div>
                     <div>MEM_USAGE: ADAPTIVE</div>
@@ -46,7 +46,7 @@ export default function EdgeDecorations() {
             </div>
 
 
-            <div className="absolute right-10 bottom-12 opacity-5 hidden md:block text-right">
+            <div className="absolute right-4 md:right-10 bottom-6 md:bottom-12 opacity-5 block text-right">
                 <div className="font-mono text-[6px] leading-relaxed space-y-1 uppercase tracking-[0.2em]">
                     <div>[ 新入荷 ] NEW_IN_STOCK</div>
                     <div>[ 限定版 ] LIMITED_EDITION</div>

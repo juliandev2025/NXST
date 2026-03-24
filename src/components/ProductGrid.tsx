@@ -21,6 +21,10 @@ export default function ProductGrid() {
 
     useEffect(() => {
         async function fetchProducts() {
+            if (!supabase) {
+                setIsLoading(false);
+                return; // Sin Supabase, usar catálogo local (ya cargado por defecto)
+            }
             try {
                 const { data, error } = await supabase
                     .from("products")
@@ -30,8 +34,8 @@ export default function ProductGrid() {
                 if (data && data.length > 0) {
                     setProducts(data);
                 }
-            } catch (err) {
-                console.log("Using internal catalog assets");
+            } catch {
+                // Fallback silencioso al catálogo local
             } finally {
                 setIsLoading(false);
             }
@@ -40,7 +44,7 @@ export default function ProductGrid() {
     }, []);
 
     return (
-        <section className="relative w-full py-32 px-6 md:px-12 bg-transparent">
+        <section className="relative w-full py-16 md:py-32 px-4 md:px-12 bg-transparent">
             {/* Grid Decorative Lines */}
             <div className="absolute top-0 left-12 bottom-0 w-[1px] bg-black/[0.03] hidden lg:block"></div>
             <div className="absolute top-0 right-12 bottom-0 w-[1px] bg-black/[0.03] hidden lg:block"></div>
@@ -55,7 +59,7 @@ export default function ProductGrid() {
                                 {mounted && language === "ES" ? "PROTOTIPOS_ACTUALES" : "CURRENT_PROTOTYPES"}
                             </span>
                         </div>
-                        <h2 className="text-4xl md:text-5xl font-heading font-black tracking-tight uppercase leading-none">
+                        <h2 className="text-2xl md:text-4xl lg:text-5xl font-heading font-black tracking-tight uppercase leading-none">
                             {mounted && language === "ES" ? (
                                 <>Catálogos <br className="md:hidden" /> Destacados</>
                             ) : (
@@ -73,7 +77,7 @@ export default function ProductGrid() {
                 </div>
 
                 {/* Product Grid */}
-                <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 md:gap-x-12 gap-y-16 lg:gap-y-24">
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-3 md:gap-x-12 gap-y-8 md:gap-y-16 lg:gap-y-24">
                     {products.map((product, idx) => (
                         <div 
                             key={product.id} 
@@ -82,7 +86,7 @@ export default function ProductGrid() {
                         >
                             <Link
                                 href={`/product/${product.id}`}
-                                className="relative aspect-[4/5] overflow-hidden bg-[#e0e0e0] mb-6 block"
+                                className="relative aspect-[3/4] md:aspect-[4/5] overflow-hidden bg-[#e0e0e0] mb-3 md:mb-6 block"
                             >
                                 <Image
                                     src={product.image}
@@ -103,12 +107,12 @@ export default function ProductGrid() {
 
                                 <div className="absolute top-4 left-4 flex flex-col gap-2">
                                     {product.status === "ST_LIMITED" && (
-                                        <span className="bg-black text-white font-mono text-[8px] tracking-[0.2em] px-3 py-1.5 uppercase">
+                                        <span className="bg-black text-white font-mono text-[7px] md:text-[8px] tracking-[0.15em] md:tracking-[0.2em] px-2 md:px-3 py-1 md:py-1.5 uppercase">
                                             {mounted && language === "ES" ? "LIMITADO // 限定" : "LIMITED // 限定"}
                                         </span>
                                     )}
                                     {product.status === "ST_PHASE_01" && (
-                                        <span className="bg-gold-primary text-white font-mono text-[8px] tracking-[0.2em] px-3 py-1.5 uppercase">
+                                        <span className="bg-gold-primary text-white font-mono text-[7px] md:text-[8px] tracking-[0.15em] md:tracking-[0.2em] px-2 md:px-3 py-1 md:py-1.5 uppercase">
                                             {mounted && language === "ES" ? "NUEVO // 新入荷" : "NEW_IN // 新入荷"}
                                         </span>
                                     )}
@@ -138,10 +142,10 @@ export default function ProductGrid() {
 
                             <div className="space-y-1 px-1">
                                 <div className="flex justify-between items-start gap-4">
-                                    <h3 className="font-heading text-xs font-bold tracking-wider leading-tight group-hover:text-gold-primary transition-colors uppercase">
+                                    <h3 className="font-heading text-[10px] md:text-xs font-bold tracking-wider leading-tight group-hover:text-gold-primary transition-colors uppercase truncate">
                                         {product.name}
                                     </h3>
-                                    <span className="font-mono text-[11px] font-medium opacity-80">
+                                    <span className="font-mono text-[9px] md:text-[11px] font-medium opacity-80 shrink-0">
                                         {mounted ? formatPrice(product.price, currency) : product.price}
                                     </span>
                                 </div>

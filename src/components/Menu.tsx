@@ -45,47 +45,50 @@ export default function Menu({ isOpen, onClose }: MenuProps) {
     return (
         <div className="fixed inset-0 z-[100] bg-[#b3b3b3]/95 backdrop-blur-xl flex flex-col items-stretch overflow-hidden text-black">
 
-            <div className="flex w-full industrial-border-b h-12 items-center font-mono text-[10px] wide-tracking uppercase">
+            {/* Header Bar */}
+            <div className="flex w-full industrial-border-b h-12 items-center font-mono text-[10px] wide-tracking uppercase shrink-0">
                 <div
                     onClick={onClose}
-                    className="w-1/4 h-full industrial-border-r flex items-center px-6 gap-2 hover:bg-black/5 cursor-pointer transition-colors"
+                    className="h-full industrial-border-r flex items-center px-4 md:px-6 gap-2 hover:bg-black/5 cursor-pointer transition-colors shrink-0"
                 >
                     <div className="w-4 h-[1px] bg-black rotate-45 absolute"></div>
                     <div className="w-4 h-[1px] bg-black -rotate-45 relative"></div>
                     <span className="ml-4">{mounted && isEs ? "CERRAR" : "CLOSE"}</span>
                 </div>
-                <div className="flex-[1.5] h-full flex items-center justify-center">
-                    <span className="font-heading text-xl font-black tracking-[0.1em]">{mounted && isEs ? "INTERFAZ_NAVEGACIÓN" : "NAVIGATION_INTERFACE"}</span>
+                <div className="flex-1 h-full flex items-center justify-center min-w-0 overflow-hidden px-2">
+                    <span className="font-heading text-base md:text-xl font-black tracking-[0.1em] truncate">{mounted && isEs ? "INTERFAZ_NAV" : "NAV_INTERFACE"}</span>
                 </div>
-                <div className="w-1/3 h-full industrial-border-l flex items-center justify-center px-6">
-                    <span className="opacity-50">BOG_{mounted ? time : "00:00:00"}</span>
+                <div className="h-full industrial-border-l flex items-center justify-center px-4 md:px-6 shrink-0">
+                    <span className="opacity-50 text-[8px]">BOG_{mounted ? time : "00:00:00"}</span>
                 </div>
             </div>
 
 
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 w-full">
+            {/* Content — stacks vertically on mobile, 3 cols on md+ */}
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 w-full overflow-y-auto">
 
-                <div className="industrial-border-r p-8 md:p-12 flex flex-col justify-between">
+                {/* Column 1: Main Navigation */}
+                <div className="industrial-border-r p-6 md:p-12 flex flex-col justify-between">
                     <div className="space-y-4">
-                        <span className="font-mono text-[9px] opacity-40 block mb-6">/ {mounted && isEs ? "UNIDADES_DESPLIEGUE" : "DEPLOYMENT_UNITS"}</span>
-                        <nav className="flex flex-col space-y-2">
+                        <span className="font-mono text-[9px] opacity-40 block mb-4 md:mb-6">/ {mounted && isEs ? "UNIDADES_DESPLIEGUE" : "DEPLOYMENT_UNITS"}</span>
+                        <nav className="flex flex-col space-y-1 md:space-y-2">
                             {MAIN_LINKS.map((item) => (
                                 <Link
                                     key={item.label}
                                     href={item.href}
                                     onClick={onClose}
-                                    className="font-heading text-4xl md:text-5xl font-black hover:italic hover:translate-x-4 transition-all duration-500 flex items-center group"
+                                    className="font-heading text-2xl md:text-4xl lg:text-5xl font-black hover:italic hover:translate-x-4 transition-all duration-500 flex items-center group"
                                 >
-                                    <span className="opacity-0 group-hover:opacity-100 mr-4 text-sm font-mono translate-y-[-10px]">▶</span>
+                                    <span className="opacity-0 group-hover:opacity-100 mr-4 text-sm font-mono translate-y-[-10px] hidden md:inline">▶</span>
                                     {item.label}
                                 </Link>
                             ))}
                         </nav>
                     </div>
 
-                    <div className="space-y-2 pt-12">
+                    <div className="space-y-2 pt-6 md:pt-12">
                         <span className="font-mono text-[9px] opacity-40 block mb-4">/ {mounted && isEs ? "PROTOCOLO_SISTEMA" : "SYSTEM_PROTOCOLS"}</span>
-                        <div className="flex flex-wrap gap-x-8 gap-y-2">
+                        <div className="flex flex-wrap gap-x-6 md:gap-x-8 gap-y-2">
                             <Link href="#" className="font-mono text-[10px] hover:underline underline-offset-4 decoration-1">{mounted && isEs ? "MI CUENTA" : "MY ACCOUNT"}</Link>
                             <Link href="#" className="font-mono text-[10px] hover:underline underline-offset-4 decoration-1">{mounted && isEs ? "RASTREO PEDIDO" : "ORDER TRACKING"}</Link>
                             <Link href="#" className="font-mono text-[10px] hover:underline underline-offset-4 decoration-1">{mounted && isEs ? "LISTA DESEOS" : "WISH LIST"}</Link>
@@ -94,7 +97,8 @@ export default function Menu({ isOpen, onClose }: MenuProps) {
                 </div>
 
 
-                <div className="industrial-border-r p-8 md:p-12 flex flex-col bg-black/[0.02]">
+                {/* Column 2: Collections */}
+                <div className="flex industrial-border-r p-6 md:p-12 flex-col bg-black/[0.02] border-t md:border-t-0">
                     <span className="font-mono text-[9px] opacity-40 block mb-8">/ {mounted && isEs ? "SECUENCIAS_ACTIVAS" : "ACTIVE_SEQUENCES"}</span>
                     <div className="grid grid-cols-1 gap-8">
                         <div>
@@ -128,12 +132,13 @@ export default function Menu({ isOpen, onClose }: MenuProps) {
                 </div>
 
 
-                <div className="p-8 md:p-12 flex flex-col justify-between">
+                {/* Column 3: Manifesto & Social */}
+                <div className="flex p-6 md:p-12 flex-col justify-between border-t md:border-t-0">
                     <div>
                         <span className="font-mono text-[9px] opacity-40 block mb-8">/ {mounted && isEs ? "MANIFESTO_LAB" : "LAB_MANIFESTO"}</span>
                         <div className="space-y-8">
                             <p className="font-mono text-[11px] leading-relaxed opacity-60 max-w-[280px]">
-                                {mounted && isEs 
+                                {mounted && isEs
                                     ? "NEXUS SAINT ES UNA RESPUESTA SISTÉMICA A LA CONDICIÓN POSTHUMANA. DESARROLLAMOS ROPA COMO INTERFAZ, MEZCLANDO FUNCIONALIDAD INDUSTRIAL CON ESTÉTICA CIBERNÉTICA."
                                     : "NEXUS SAINT IS A SYSTEMIC RESPONSE TO THE POSTHUMAN CONDITION. WE DEVELOP APPAREL AS INTERFACE, BLENDING INDUSTRIAL FUNCTIONALITY WITH CYBERNETIC AESTHETICS."}
                             </p>
@@ -157,11 +162,12 @@ export default function Menu({ isOpen, onClose }: MenuProps) {
             </div>
 
 
-            <div className="flex w-full industrial-border-t h-12 items-center font-mono text-[8px] wide-tracking uppercase px-8 justify-between opacity-40">
+            {/* Footer Bar */}
+            <div className="flex w-full industrial-border-t h-10 md:h-12 items-center font-mono text-[7px] md:text-[8px] wide-tracking uppercase px-4 md:px-8 justify-between opacity-40 shrink-0">
                 <span>© 2025 NEXUS_SAINT_SYSTEMS</span>
-                <div className="flex gap-12">
-                    <span>{mounted && isEs ? "ESTADO: OPERATIVO" : "STATUS: OPERATIONAL"}</span>
-                    <span>{mounted && isEs ? "ENCRIPTACIÓN: ACTIVA" : "ENCRYPTION: ACTIVE"}</span>
+                <div className="flex gap-4 md:gap-12">
+                    <span className="hidden sm:inline">{mounted && isEs ? "ESTADO: OPERATIVO" : "STATUS: OPERATIONAL"}</span>
+                    <span className="hidden md:inline">{mounted && isEs ? "ENCRIPTACIÓN: ACTIVA" : "ENCRYPTION: ACTIVE"}</span>
                     <span>LOC: BOGOTA_COL</span>
                 </div>
             </div>

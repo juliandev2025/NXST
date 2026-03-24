@@ -9,20 +9,25 @@ interface Props {
 }
 
 async function getProduct(id: string) {
+    // Check local catalog first for known IDs
     if (id.startsWith("st-")) {
         return ALL_PRODUCTS.find((p) => p.id === id) || null;
     }
 
-    try {
-        const { data, error } = await supabase
-            .from("products")
-            .select("*")
-            .eq("id", id)
-            .single();
-        if (data && !error) return data;
-    } catch (err) {
-        // fallback
+    // Try Supabase if available
+    if (supabase) {
+        try {
+            const { data, error } = await supabase
+                .from("products")
+                .select("*")
+                .eq("id", id)
+                .single();
+            if (data && !error) return data;
+        } catch {
+            // fallback to local catalog
+        }
     }
+
     return ALL_PRODUCTS.find((p) => p.id === id) || null;
 }
 
@@ -56,14 +61,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProductPage({ params }: Props) {
     const { id } = await params;
-    console.log("Fetching product with ID:", id);
     const product = await getProduct(id);
 
     if (!product) {
-        console.log("Product not found for ID:", id);
         notFound();
     }
 
-    console.log("Found product:", product.name);
     return <ProductDetailsContent initialProduct={product} />;
 }

@@ -32,7 +32,7 @@ export default function Hero() {
     return (
         <section
             ref={containerRef}
-            className={`relative h-[90vh] w-full flex flex-col items-center justify-center overflow-hidden transition-all duration-1000 ease-out ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+            className={`relative h-[75vh] md:h-[90vh] w-full flex flex-col items-center justify-center overflow-hidden transition-all duration-1000 ease-out ${isVisible ? 'opacity-100' : 'opacity-0'}`}
         >
             {/* Cinematic Background Image with Parallax */}
             <div
@@ -42,7 +42,7 @@ export default function Hero() {
                     transition: 'transform 0.4s cubic-bezier(0.1, 0, 0, 1)'
                 }}
             >
-                <div className="relative w-full h-full grayscale brightness-[1.1] contrast-[1.1] opacity-[0.15]">
+                <div className="relative w-full h-full grayscale brightness-[1.1] contrast-[1.1] opacity-[0.25] blur-[15px]">
                     <Image
                         src="/hero-core.png"
                         alt="NEXUS INDUSTRIAL CORE"
@@ -58,12 +58,12 @@ export default function Hero() {
 
             {/* Central Framing Interface */}
             <div className="relative z-30 flex flex-col items-center max-w-5xl w-full px-6">
-                <div className="flex items-center gap-4 mb-8 opacity-40 animate-pulse">
-                    <div className="h-[1px] w-12 bg-black"></div>
-                    <span className="font-mono text-[9px] tracking-[0.5em] uppercase">
+                <div className="flex items-center gap-3 md:gap-4 mb-6 md:mb-8 opacity-40 animate-pulse">
+                    <div className="h-[1px] w-8 md:w-12 bg-black"></div>
+                    <span className="font-mono text-[7px] md:text-[9px] tracking-[0.3em] md:tracking-[0.5em] uppercase">
                         SYSTEM_ID: NX-2026-ST
                     </span>
-                    <div className="h-[1px] w-12 bg-black"></div>
+                    <div className="h-[1px] w-8 md:w-12 bg-black"></div>
                 </div>
 
                 <div className="relative group cursor-default">
@@ -78,18 +78,18 @@ export default function Hero() {
                     </h1>
                 </div>
 
-                <p className="mt-12 font-mono text-[10px] md:text-[11px] opacity-50 max-max-w-md text-center leading-relaxed tracking-wider uppercase">
+                <p className="mt-8 md:mt-12 font-mono text-[9px] md:text-[11px] opacity-50 max-w-xs md:max-w-md text-center leading-relaxed tracking-wider uppercase px-4">
                     {mounted && language === "ES" 
                         ? "Ropa arquitectónica para la era posthumana. La utilidad industrial se une al refinamiento cibernético." 
                         : "Architectural apparel for the posthuman era. Industrial utility meets cybernetic refinement."}
                 </p>
 
-                <div className="mt-12 flex flex-col md:flex-row gap-6">
-                    <button className="mercury-btn group relative px-12 py-4 bg-black text-white font-mono text-[10px] tracking-[0.2em] uppercase sharp overflow-hidden">
+                <div className="mt-8 md:mt-12 flex flex-col sm:flex-row gap-3 md:gap-6 w-full sm:w-auto px-6 sm:px-0">
+                    <button className="mercury-btn group relative px-8 md:px-12 py-3.5 md:py-4 bg-black text-white font-mono text-[9px] md:text-[10px] tracking-[0.2em] uppercase sharp overflow-hidden w-full sm:w-auto">
                         <span className="relative z-10">{mounted && language === "ES" ? "INICIALIZAR_ACTIVOS" : "INITIALIZE_ASSETS"}</span>
                         <div className="btn-shine"></div>
                     </button>
-                    <button className="px-12 py-4 border border-black/10 hover:border-black transition-colors font-mono text-[10px] tracking-[0.2em] uppercase sharp">
+                    <button className="px-8 md:px-12 py-3.5 md:py-4 border border-black/10 hover:border-black transition-colors font-mono text-[9px] md:text-[10px] tracking-[0.2em] uppercase sharp w-full sm:w-auto">
                         {mounted && language === "ES" ? "Ver_Manifiesto" : "View_Manifesto"}
                     </button>
                 </div>

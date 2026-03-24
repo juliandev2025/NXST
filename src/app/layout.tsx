@@ -43,7 +43,7 @@ export default function RootLayout({
         <EdgeDecorations />
         <Navbar />
         <CartSidebar />
-        <main className="relative z-10 pt-20 min-h-screen">
+        <main className="relative z-10 pt-[76px] md:pt-20 min-h-screen">
           {children}
         </main>
         <Footer />

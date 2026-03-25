@@ -5,7 +5,7 @@ import { useSettingsStore } from "@/lib/settings-store";
 import { useMounted } from "@/lib/hooks";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { products } from "@/lib/products";
+import { ALL_PRODUCTS as products } from "@/lib/products";
 
 export default function AdminDashboard() {
     const { user, logout, isAuthenticated } = useAuthStore();

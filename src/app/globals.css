@@ -47,13 +47,15 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Cinematic Backgrounds */
+/* Cinematic Backgrounds — GPU Optimized */
 .fog-wrapper {
   position: fixed;
   inset: 0;
   z-index: -3;
   overflow: hidden;
   background: #b3b3b3;
+  contain: strict;
+  transform: translateZ(0);
 }
 
 .background-pattern {
@@ -64,6 +66,8 @@ body {
     radial-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px);
   background-size: 32px 32px;
   pointer-events: none;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .background-pattern::after {
@@ -86,6 +90,8 @@ body {
       transparent 50%,
       rgba(0, 0, 0, 0.02) 80%,
       rgba(0, 0, 0, 0.05) 100%);
+  transform: translateZ(0);
+  contain: layout paint;
 }
 
 .fog-layer {
@@ -101,6 +107,8 @@ body {
     radial-gradient(circle at 30% 80%, rgba(235, 240, 250, 0.05) 0%, transparent 50%);
   filter: blur(80px);
   animation: fog-move 25s ease-in-out infinite alternate;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 @keyframes fog-move {
@@ -113,11 +121,13 @@ body {
   }
 }
 
-/* Liquid Glass Hyperclear Overlay */
+/* Liquid Glass Hyperclear Overlay — GPU Accelerated */
 header {
   background: rgba(255, 255, 255, 0.02) !important;
   backdrop-filter: blur(20px) saturate(105%) brightness(1.01) !important;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .liquid-glass {
@@ -130,6 +140,8 @@ header {
       rgba(250, 252, 255, 0.03) 0%,
       rgba(255, 255, 255, 0) 40%,
       rgba(245, 247, 250, 0.02) 100%);
+  transform: translateZ(0);
+  contain: layout paint;
 }
 
 /* Subdued Glass Sheen / Reflection Layer */
@@ -482,4 +494,43 @@ h4,
   opacity: 0.8;
   transform: translate(0, 0);
   filter: drop-shadow(0 0 5px var(--color-gold-glow));
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PUNTO 2 — Reducción de carga GPU en dispositivos móviles
+   Desactiva los efectos más pesados (blur, parallax, fog)
+   en pantallas pequeñas o dispositivos sin hover (táctiles).
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px), (hover: none) {
+  header {
+    /* Reduce blur de 20px a 10px — ahorro de ~40% GPU */
+    backdrop-filter: blur(10px) saturate(102%) !important;
+  }
+
+  .liquid-glass {
+    /* Reduce blur de 60px a 20px — el efecto más costoso */
+    backdrop-filter: blur(20px) saturate(105%);
+  }
+
+  .fog-layer {
+    /* Reduce blur y desactiva animación para ahorrar frames */
+    filter: blur(40px);
+    animation: none;
+  }
+
+  .liquid-glass::before,
+  .liquid-glass::after {
+    /* Desactiva capas decorativas (sheen + noise) en móvil */
+    display: none;
+  }
+
+  .background-pattern::after {
+    /* Desactiva grid lines overlay en móvil */
+    display: none;
+  }
+
+  .mercury-border::after {
+    /* Desactiva mercury liquid effect en móvil */
+    display: none;
+  }
 }
